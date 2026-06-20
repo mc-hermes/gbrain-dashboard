@@ -1,0 +1,39 @@
+{
+  "updated_at": "2026-06-20T00:00:00Z",
+  "summary": {
+    "page_count": 0,
+    "concept_count": 0,
+    "person_count": 0,
+    "company_count": 0,
+    "meeting_count": 0,
+    "newsletter_count": 0,
+    "article_count": 0,
+    "bookmark_count": 0,
+    "digest_count": 0,
+    "dataset_count": 0,
+    "total_links": 0,
+    "inbound_count": 0,
+    "outbound_count": 0,
+    "graph_coverage": "0% — load your data to see graph coverage",
+    "embed_coverage": "0% — load your data to see embedding coverage",
+    "entity_links": "0%",
+    "score": "—",
+    "score_label": "ready",
+    "score_breakdown": "No data loaded yet. Upload your gbrain-data.json using the gear icon above.",
+    "artifact_count": 0,
+    "checks_passed": 0,
+    "checks_warned": 0,
+    "checks_failed": 0
+  },
+  "pages": [],
+  "graph_links": [],
+  "entities": {
+    "people": [],
+    "companies": []
+  },
+  "doctor": {
+    "summary": "No data loaded",
+    "checks": []
+  },
+  "artifacts": []
+}
