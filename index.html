@@ -6,7 +6,7 @@
 <title>gbrain-dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&amp;family=Syne:wght@600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   /* ═══════════════════════════════════════════════
      gbrain dashboard — Tokyo Night Design System
@@ -45,6 +45,78 @@
     --text: #2c1810; --text-muted: #6b5b4f; --green: #5d7a3a; --violet: #6b3fa0;
     --rose: #c0392b; --graph-bg: #faf6f0;
   }
+  /* ─── Library Theme (default) — warm academic library aesthetic ─── */
+  body.library {
+    --bg: #faf8f5; --surface: #ffffff; --surface2: #f5efe8; --border: #d9cfbf;
+    --primary: #5c3d2e; --primary-light: #8b6b3d; --accent: #8b6914; --accent-light: #b8860b;
+    --text: #2c1810; --text-muted: #7a6b5d; --green: #4a7c3f; --violet: #6b3fa0;
+    --rose: #b22222; --graph-bg: #faf8f5;
+    --radius: 6px; --radius-sm: 4px;
+  }
+  /* Library: typography — serif headings, comfortable reading body */
+  body.library { font-family: 'Crimson Text', 'Georgia', 'Inter', serif; }
+  body.library h1, body.library h2, body.library h3, body.library h4,
+  body.library .display-font, body.library .header-left h1,
+  body.library .fc-title, body.library .dc-title, body.library .stat-chip .sc-value,
+  body.library .stat-card .value, body.library .entity-card .name,
+  body.library .modal-header .m-title, body.library .docs-content h2,
+  body.library .docs-content h3, body.library .live-query-section .section-header h2,
+  body.library .section-header h2, body.library .feed-section h2,
+  body.library .wc-title, body.library .token-dialog h3 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  /* Library: subtle paper grain texture */
+  body.library {
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+  }
+  /* Library: card-catalog aesthetics */
+  body.library .stat-card, body.library .feed-card, body.library .entity-card,
+  body.library .digest-card, body.library .health-item, body.library .artifact-card,
+  body.library .lq-card {
+    box-shadow: 0 1px 2px rgba(44,24,16,0.04), 0 1px 3px rgba(44,24,16,0.03);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+  body.library .feed-card:hover, body.library .entity-card:hover,
+  body.library .stat-card:hover, body.library .digest-card:hover,
+  body.library .artifact-card:hover {
+    box-shadow: 0 4px 16px rgba(44,24,16,0.08);
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+  body.library .health-item:hover { box-shadow: 0 2px 8px rgba(44,24,16,0.06); border-color: var(--primary-light); }
+  /* Library: shelf dividers */
+  body.library .section { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 8px; }
+  body.library .section:first-of-type { border-top: none; padding-top: 0; }
+  body.library .feed-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 4px; }
+  body.library .feed-section:first-of-type { border-top: none; padding-top: 0; }
+  /* Library: reading-room modal */
+  body.library .modal { box-shadow: 0 12px 40px rgba(44,24,16,0.15); border: 1px solid var(--border); }
+  body.library .modal-body .m-content { font-family: 'Crimson Text', 'Georgia', serif; font-size: 0.88rem; line-height: 1.85; }
+  body.library .modal-body .m-content strong { color: var(--primary); font-weight: 700; }
+  /* Library: stat chips */
+  body.library .stat-chip { box-shadow: 0 1px 2px rgba(44,24,16,0.05); border-radius: 999px; }
+  /* Library: digest card */
+  body.library .digest-card { border-left: 3px solid var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(139,105,20,0.03) 100%); }
+  /* Library: header */
+  body.library .header-left h1 span { color: var(--primary); font-style: italic; }
+  body.library .header-left .sub { font-style: italic; color: var(--text-muted); }
+  /* Library: feed card link line */
+  body.library .feed-card .fc-link-line { background: var(--accent); }
+  /* Library: table */
+  body.library th { background: var(--surface2); font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  body.library tr.page-row:hover td { background: rgba(92,61,46,0.03); }
+  /* Library: mobile nav */
+  body.library .mobile-nav { background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -2px 12px rgba(44,24,16,0.04); }
+  /* Library: scrollbar */
+  body.library ::-webkit-scrollbar { width: 8px; }
+  body.library ::-webkit-scrollbar-track { background: var(--bg); }
+  body.library ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  body.library ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
   /* ─── Base ─── */
   html { scroll-behavior: smooth; }
@@ -146,6 +218,10 @@
   .log-stage.warn { background: rgba(224,175,104,0.12); color: var(--accent); }
   .log-stage.error { background: rgba(247,118,142,0.12); color: var(--rose); }
   .log-detail { color: var(--text); word-break: break-word; }
+  @media (max-width: 768px) {
+    .log-row { flex-wrap: wrap; }
+    .log-detail { flex-basis: 100%; padding-top: 2px; }
+  }
   .log-offline { color: var(--text-muted); font-style: italic; padding: 6px 0; }
 
   /* ─── Table ─── */
@@ -345,7 +421,8 @@
   .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); z-index: 90; padding: 4px 0 env(safe-area-inset-bottom, 8px); }
   .mobile-nav-inner { display: flex; justify-content: space-around; align-items: center; max-width: 500px; margin: 0 auto; }
   .mobile-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 10px; min-width: 56px; min-height: 48px; border: none; background: none; color: var(--text-muted); font-size: 0.55rem; font-weight: 500; font-family: 'Inter', sans-serif; cursor: pointer; transition: color 0.15s; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
-  .mobile-nav-btn .nav-icon { font-size: 1.2rem; line-height: 1; }
+  .mobile-nav-btn .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+  .mobile-nav-btn .nav-icon svg { display: block; width: 100%; height: 100%; }
   .mobile-nav-btn.active { color: var(--primary); }
   .mobile-nav-btn:active { background: rgba(122,162,247,0.08); }
 
@@ -382,8 +459,32 @@
   .float-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
   .float-btn:hover { border-color: var(--text-muted); color: var(--text); }
 
+  /* ─── Left Sidebar (Desktop) ─── */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 64px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 80; overflow-y: auto; gap: 2px; transition: width 0.2s ease; box-shadow: 2px 0 12px rgba(0,0,0,0.15); }
+  .sidebar:hover { width: 180px; }
+  .sidebar.pinned { width: 180px; }
+  .sidebar.pinned .sidebar-item .s-label { opacity: 1; }
+  .sidebar-pin { width: 100%; display: flex; align-items: center; justify-content: center; padding: 6px 0; margin-bottom: 4px; border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 0.65rem; font-family: 'Inter', sans-serif; transition: all 0.15s; opacity: 0.4; }
+  .sidebar-pin:hover { opacity: 1; color: var(--text); }
+  .sidebar.pinned .sidebar-pin { opacity: 0.7; }
+  .sidebar-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0; }
+  .sidebar-logo svg { width: 20px; height: 20px; color: #1a1b26; }
+  .sidebar-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; background: none; color: var(--text-muted); font-size: 0.72rem; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; }
+  .sidebar-item:hover { color: var(--text); background: rgba(122,162,247,0.06); }
+  .sidebar-item.active { color: var(--primary); background: rgba(122,162,247,0.1); border-left-color: var(--primary); }
+  .sidebar-item .s-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .sidebar-item .s-icon svg { width: 16px; height: 16px; }
+  .sidebar-item .s-label { opacity: 0; transition: opacity 0.15s; }
+  .sidebar:hover .sidebar-item .s-label { opacity: 1; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-item.write-btn { margin-top: 8px; color: var(--primary) !important; font-weight: 600; }
+  .sidebar-item.write-btn:hover { background: rgba(122,162,247,0.15); }
+  @media (max-width: 768px) { .sidebar { display: none; } .app-shell { margin-left: 0; } }
+  @media (min-width: 769px) { .app-shell { margin-left: 64px; } }
+
   /* ─── Settings ─── */
-  .settings-popover { position: fixed; bottom: 120px; left: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; width: 220px; box-shadow: 0 12px 32px rgba(0,0,0,0.4); z-index: 60; display: none; animation: modalIn 0.15s ease; }
+  .settings-popover { position: fixed; bottom: 120px; left: 84px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; width: 220px; box-shadow: 0 12px 32px rgba(0,0,0,0.4); z-index: 85; display: none; animation: modalIn 0.15s ease; }
   .settings-popover.active { display: block; }
   .settings-popover h3 { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; margin-bottom: 12px; }
   .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.7rem; }
@@ -736,13 +837,30 @@
 </style>
 </head>
 <body>
+<div class="app-shell">
+
+<!-- Left Sidebar (Desktop) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none" stroke-width="1.5"/><path d="M5 8c0-2 1-3 3-3s3 1 3 3-1 3-3 3-3-1-3-3z" stroke="currentColor" fill="none"/></svg></div>
+  <button class="sidebar-pin" onclick="toggleSidebarPin()" title="Pin sidebar open">📌</button>
+  <button class="sidebar-item active" data-view="today" onclick="showView('today')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg></span><span class="s-label">Today</span></button>
+  <button class="sidebar-item" data-view="browse" onclick="showView('browse')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Library</span></button>
+  <button class="sidebar-item" data-view="graph" onclick="showView('graph')"><span class="s-icon"><svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg></span><span class="s-label">Graph</span></button>
+  <button class="sidebar-item" data-view="ask" onclick="showView('ask')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Ask</span></button>
+  <button class="sidebar-item" data-view="logs" onclick="showView('logs')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 6.5h10M3 10h7M3 13h5" stroke="currentColor" stroke-linecap="round"/></svg></span><span class="s-label">Activity</span></button>
+  <div class="sidebar-spacer"></div>
+  <button class="sidebar-item write-btn" onclick="openWrite()"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 13h10M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="s-label">Write</span></button>
+  <button class="sidebar-item" onclick="event.stopPropagation();toggleSettings()"><span class="s-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5" stroke="currentColor" fill="none"/><path d="M8 2v1.5M8 12.5v1.5M2 8h1.5M12.5 8h1.5" stroke="currentColor"/></svg></span><span class="s-label">Settings</span></button>
+  <button class="sidebar-item" onclick="openDocs()"><span class="s-icon"><svg viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="1.3"/><text x="8" y="11.5" text-anchor="middle" font-size="11" font-family="Inter,sans-serif" fill="currentColor" stroke="none">?</text></svg></span><span class="s-label">Help</span></button>
+</aside>
+
 <main>
 <div class="app">
 
   <!-- Header -->
   <div class="header">
     <div class="header-left">
-      <h1><span>gbrain</span></h1>
+      <h1><span>📚 gbrain</span></h1>
       <div class="sub">Tap ⚙️ to connect your brain</div>
     </div>
     <div class="header-right">
@@ -971,6 +1089,7 @@
   <div class="settings-row">
     <span>Theme</span>
     <select id="themeSelect" onchange="applyTheme(this.value)" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:0.7rem;font-family:'Inter',sans-serif;max-width:120px">
+      <option value="library">Library</option>
       <option value="dark">Dark</option>
       <option value="light">Light</option>
       <option value="catppuccin-mocha">Catppuccin Mocha</option>
@@ -1301,8 +1420,6 @@ async function loadFromMCP() {
     _mcpSource: true
   };
 }
-
-var DATA = null;
 
 async function loadData(source) {
   document.getElementById('loading').style.display = 'flex';
@@ -2303,17 +2420,22 @@ function togglePhysics() {
 }
 
 // ─── THEME ───
-const THEME_CLASSES = ['light', 'catppuccin-mocha', 'catppuccin-latte', 'tokyo-night', 'omarchy'];
+const THEME_CLASSES = ['dark', 'light', 'catppuccin-mocha', 'catppuccin-latte', 'tokyo-night', 'omarchy', 'library'];
 function applyTheme(name) {
   document.body.classList.remove(...THEME_CLASSES);
-  if (name !== 'dark') document.body.classList.add(name);
+  if (name && name !== 'dark') document.body.classList.add(name);
   localStorage.setItem('gbrain-theme', name);
   document.getElementById('themeSelect').value = name;
   setTimeout(drawGraphFrame, 50);
 }
-(function() { const saved = localStorage.getItem('gbrain-theme') || 'dark'; applyTheme(saved); })();
+(function() { const saved = localStorage.getItem('gbrain-theme') || 'library'; applyTheme(saved); })();
+(function() { if (localStorage.getItem('gbrain-sidebar-pinned') === 'true') document.getElementById('sidebar').classList.add('pinned'); })();
 
 // ─── SETTINGS ───
+function toggleSidebarPin() {
+  document.getElementById('sidebar').classList.toggle('pinned');
+  localStorage.setItem('gbrain-sidebar-pinned', document.getElementById('sidebar').classList.contains('pinned'));
+}
 function toggleSettings() {
   document.getElementById('settingsPopover').classList.toggle('active');
 }
@@ -2584,7 +2706,7 @@ function openPageModal(slug) {
   const page = (DATA.pages||[]).find(p => p.slug === slug);
   if (!page) {
     // API fallback: when a page isn't in the static JSON, fetch it live from the API
-    var apiBase = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+    var apiBase = localStorage.getItem('gbrain-read-api') || '';
     var title = slug.split('/').pop().replace(/-/g, ' ').replace(/_/g, ' ');
     openModal('[loading…]', slug, '<div style="padding:20px;text-align:center;color:var(--muted)">Fetching page…</div>');
     fetch(apiBase + '/api/pages/' + encodeURIComponent(slug))
@@ -2860,7 +2982,7 @@ async function saveEdit() {
   }
 
   // API fallback
-  var API_BASE = localStorage.getItem('gbrain-write-api') || 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  var API_BASE = localStorage.getItem('gbrain-write-api') || '';
   try {
     var r = await fetch(API_BASE + '/api/pages/' + encodeURIComponent(slug), {
       method: 'PUT',
@@ -2879,7 +3001,7 @@ async function saveEdit() {
       }
     }
   } catch(e) {
-    // Offline edit: just update local DATA
+    // Offline edit: update local DATA and persist to localStorage
     var page2 = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
     if (page2) {
       page2.title = title || page2.title;
@@ -2889,6 +3011,8 @@ async function saveEdit() {
         Object.keys(putArgs.entity_fields).forEach(function(k) { page2[k] = putArgs.entity_fields[k]; });
       }
     }
+    // Persist modified DATA to localStorage so edits survive refresh
+    try { localStorage.setItem('gbrain-custom-data', JSON.stringify(DATA)); } catch(e2) {}
   }
 
   _editSlug = null; _editTags = [];
@@ -2931,7 +3055,7 @@ async function confirmDelete() {
 
   // API fallback
   if (!success) {
-    var API_BASE = localStorage.getItem('gbrain-write-api') || 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+    var API_BASE = localStorage.getItem('gbrain-write-api') || '';
     try {
       var r = await fetch(API_BASE + '/api/pages/' + encodeURIComponent(slug), {
         method: 'DELETE',
@@ -2941,7 +3065,7 @@ async function confirmDelete() {
     } catch(e) {}
   }
 
-  // Always update local DATA (offline-friendly)
+  // Always update local DATA (offline-friendly) and persist
   if (DATA.pages) {
     DATA.pages = DATA.pages.filter(function(p) { return p.slug !== slug; });
     DATA.summary.page_count = DATA.pages.length;
@@ -2950,6 +3074,8 @@ async function confirmDelete() {
     DATA.summary.meeting_count = DATA.pages.filter(function(p){return p.type==='meeting'}).length;
     DATA.summary.concept_count = DATA.pages.filter(function(p){return p.type==='concept'}).length;
   }
+  // Persist to localStorage so deletes survive refresh
+  try { localStorage.setItem('gbrain-custom-data', JSON.stringify(DATA)); } catch(e2) {}
 
   closeDeleteConfirm();
   closeModal();
@@ -2965,6 +3091,8 @@ function removeTag(slug, tag) {
   if (MCP_CONNECTED && MCP_URL) {
     try { mcpCall('remove_tag', { slug: slug, tag: tag }); } catch(e) {}
   }
+  // Persist tag changes to localStorage
+  try { localStorage.setItem('gbrain-custom-data', JSON.stringify(DATA)); } catch(e2) {}
   reRenderAll();
   closeModal();
   setTimeout(function() { openPageModal(slug); }, 100);
@@ -2981,6 +3109,8 @@ function addTagToPage(slug, tag) {
   if (MCP_CONNECTED && MCP_URL) {
     try { mcpCall('add_tag', { slug: slug, tag: tag }); } catch(e) {}
   }
+  // Persist tag changes to localStorage
+  try { localStorage.setItem('gbrain-custom-data', JSON.stringify(DATA)); } catch(e2) {}
   reRenderAll();
   closeModal();
   setTimeout(function() { openPageModal(slug); }, 100);
@@ -3161,7 +3291,7 @@ const DOCS = {
     '</ol>' +
     '<h3>Data Format</h3><p>Your JSON must follow this schema:</p>' +
     '<pre style="font-size:0.65rem;line-height:1.4;overflow-x:auto;padding:12px;background:var(--surface2);border-radius:8px">' + esc('{\n  "updated_at": "ISO timestamp",\n  "summary": { page_count, person_count, ... },\n  "pages": [\n    {\n      "slug": "unique-id",\n      "title": "Page Title",\n      "type": "concept|person|company|meeting|newsletter|article|bookmark|digest",\n      "body": "Markdown content",\n      "tags": ["tag1", "tag2"],\n      "links_out": [{"to": "other-slug", "type": "wikilink", "text": "display text"}],\n      "backlinks": [{"from": "other-slug", "type": "wikilink", "text": "display text"}]\n    }\n  ],\n  "graph_links": [{ "source": "slug-a", "target": "slug-b", "type": "link" }],\n  "entities": { "people": ["people/name"], "companies": ["companies/name"] },\n  "doctor": { "checks": [] },\n  "artifacts": []\n}') + '</pre>' +
-    '<h3>Data Stays Local</h3><p>Your uploaded data is stored in your browser\'s <code>localStorage</code>. Nothing is sent to any server. Use "Reset to default" in the ⚙️ menu to clear it.</p>'
+    '<h3>Data Stays Local</h3><p>Your uploaded data is stored in your browser\'s <code>localStorage</code>. Nothing is sent to any server. Use "Reset to default" in the ⚙️ menu to clear it.</p>',
   clients: `<h2>For Your Clients</h2><h3>The Pitch</h3><p>"Here's what we'll do. You keep taking notes the way you normally do. We'll set up a brain that stores all of that in a way that's searchable and connected. Then we'll give you a dashboard you can open on any device."</p><h3>What They Get</h3><ul><li><strong>Company memory</strong> that doesn't walk out when someone quits</li><li><strong>Client context</strong> at their fingertips before every call</li><li><strong>Visual map</strong> of how projects, people, and ideas connect</li><li><strong>Zero maintenance</strong> — it updates itself</li></ul>`,
   scaling: `<h2>Scaling & Limits</h2><p>This dashboard — HTML, JSON, everything — is ~440 KB total. GitHub Pages allows up to 1 GB.</p><div class="callout"><strong>53 brain pages = ~30 KB JSON.</strong> At ~0.6 KB per page, you'd need roughly 1.6 million pages to hit GitHub's 1 GB site limit.</div>`,
   shortcuts: `<h2>Keyboard Shortcuts</h2><table style="width:100%;font-size:0.78rem;border-collapse:collapse"><tr><td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04)"><span class="kbd">?</span></td><td>Open this help</td></tr><tr><td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04)"><span class="kbd">Esc</span></td><td>Close modal or panel</td></tr><tr><td style="padding:8px 12px"><span class="kbd">Ctrl+K</span></td><td>Focus search</td></tr></table><h3>Graph</h3><ul><li><strong>Scroll</strong> — zoom in/out (pinch on touch)</li><li><strong>Drag background</strong> — pan</li><li><strong>Drag node</strong> — reposition</li><li><strong>Click node</strong> — open detail modal</li></ul>`
@@ -3233,7 +3363,7 @@ function runMobileQuery() {
   // Add question to thread
   thread.innerHTML += `<div style="text-align:right;margin-bottom:8px"><span style="background:rgba(34,211,238,0.1);padding:8px 14px;border-radius:14px;font-size:0.72rem">${esc(q)}</span></div>`;
 
-  const API_BASE = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  const API_BASE = localStorage.getItem('gbrain-query-api') || '';
   fetch(API_BASE + '/api/query?q=' + encodeURIComponent(q))
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(data => {
@@ -3439,7 +3569,7 @@ function sendChat() {
   typing.classList.add('active');
   let dots = 0;
   const dotInterval = setInterval(function() { dots = (dots + 1) % 4; typing.innerHTML = 'Thinking' + '.'.repeat(dots); }, 400);
-  const API_BASE = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  const API_BASE = localStorage.getItem('gbrain-query-api') || '';
   const model = document.getElementById('chatModel').value;
   fetch(API_BASE + '/api/assistant?q=' + encodeURIComponent(q) + '&model=' + encodeURIComponent(model))
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -3738,7 +3868,7 @@ function submitNote() {
   var payload = { title: title || 'Untitled thought', body: body };
   if (_activeTypeChip) payload.type_hint = _activeTypeChip;
 
-  var API_BASE = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  var API_BASE = localStorage.getItem('gbrain-write-api') || '';
   fetch(API_BASE + '/api/note', {
     method: 'POST',
     headers: {
@@ -3905,7 +4035,7 @@ function setLogsLive(state) {
 }
 
 function fetchActivity(initial) {
-  var API_BASE = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  var API_BASE = localStorage.getItem('gbrain-activity-api') || '';
   var url = API_BASE + '/api/activity?limit=200' + (_logLastTs && !initial ? '&since=' + encodeURIComponent(_logLastTs) : '');
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -3945,5 +4075,6 @@ function stopLogsPoll() {
 
 </script>
 </main>
+</div>
 </body>
 </html>
