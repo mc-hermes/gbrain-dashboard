@@ -675,7 +675,7 @@
       <div class="sub">Interactive knowledge-base dashboard</div>
     </div>
     <div class="header-right">
-      <span class="data-source-badge" id="dataSource" title="Data source">📄 default</span>
+      <span class="data-source-badge" id="dataSource" title="Data source" style="cursor:pointer" onclick="openLoadDataModal()">📄 default</span>
       <span class="last-updated" id="lastUpdated">Loading...</span>
       <button class="refresh" onclick="loadData()">↻ Refresh</button>
       <button class="icon-btn" onclick="openLoadDataModal()" title="Load your own data"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="3" stroke="currentColor" fill="none"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.2"/></svg></button>
@@ -738,8 +738,8 @@
         <div id="pendingNotes"></div>
         <div id="feedCards"></div>
         <div class="empty-state" id="feedEmpty" style="display:none">
-          <div class="empty-title">Nothing here yet</div>
-          <div class="empty-desc">Forward an email or add a note to start building your knowledge.</div>
+          <div class="empty-title">No pages yet</div>
+          <div class="empty-desc">Click the ⚙️ gear icon to connect your gbrain brain or upload data.</div>
         </div>
       </div>
     </div>
@@ -1262,24 +1262,29 @@ function updateDataSource() {
   var pages = (DATA.pages || []).length;
   if (MCP_CONNECTED && DATA._mcpSource) {
     badge.textContent = '⚡ live MCP';
-    badge.title = 'Connected to gbrain MCP at ' + MCP_URL;
+    badge.title = 'Connected to gbrain MCP at ' + MCP_URL + ' — click to change';
     badge.style.color = 'var(--primary-light)';
+    badge.style.cursor = 'pointer';
   } else {
     badge.style.color = '';
+    badge.style.cursor = 'pointer';
     var cached = localStorage.getItem('gbrain-custom-data');
     var fromUrl = DATA._loadedFromURL;
-    if (pages === 0 && !cached) {
-      badge.textContent = '📄 empty';
-      badge.title = 'Upload data via ⚙️ or connect to gbrain MCP';
+    if (pages === 0 && MCP_URL) {
+      badge.textContent = '⚡ MCP (empty)';
+      badge.title = 'Connected to gbrain but no pages found — click to reconfigure';
+    } else if (pages === 0) {
+      badge.textContent = '📄 no data';
+      badge.title = 'No data loaded — click to connect gbrain or upload';
     } else if (fromUrl) {
-      badge.textContent = '🔗 remote';
-      badge.title = 'Loaded from: ' + fromUrl;
+      badge.textContent = '🔗 ' + pages + ' pages';
+      badge.title = 'Loaded from: ' + fromUrl + ' — click to change';
     } else if (cached && pages > 0) {
       badge.textContent = '📤 ' + pages + ' pages';
-      badge.title = 'Custom data loaded in this browser';
+      badge.title = 'Custom data in browser — click to change';
     } else {
       badge.textContent = '📄 ' + pages + ' pages';
-      badge.title = 'Loaded from gbrain-data.json';
+      badge.title = 'Loaded from gbrain-data.json — click to change';
     }
   }
 }
@@ -1573,7 +1578,7 @@ function renderFeed() {
     empty.style.display = 'block';
     // Tab-specific empty state messages
     var emptyMsgs = {
-      'all': {title: 'No pages yet', desc: 'Forward an email or add a note to start building your knowledge.'},
+      'all': {title: 'No pages yet', desc: 'Click the ⚙️ gear icon above to connect your gbrain brain or upload a data file.'},
       'newsletter': {title: 'No newsletters', desc: 'Forward newsletter emails to your brain inbox.'},
       'video': {title: 'No videos', desc: 'Ingest YouTube videos or video notes to populate this section.'},
       'bookmark': {title: 'No saved items', desc: 'Save bookmarks from your reading to see them here.'},
