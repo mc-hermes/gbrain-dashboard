@@ -1421,8 +1421,6 @@ async function loadFromMCP() {
   };
 }
 
-var DATA = null;
-
 async function loadData(source) {
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
@@ -3293,7 +3291,7 @@ const DOCS = {
     '</ol>' +
     '<h3>Data Format</h3><p>Your JSON must follow this schema:</p>' +
     '<pre style="font-size:0.65rem;line-height:1.4;overflow-x:auto;padding:12px;background:var(--surface2);border-radius:8px">' + esc('{\n  "updated_at": "ISO timestamp",\n  "summary": { page_count, person_count, ... },\n  "pages": [\n    {\n      "slug": "unique-id",\n      "title": "Page Title",\n      "type": "concept|person|company|meeting|newsletter|article|bookmark|digest",\n      "body": "Markdown content",\n      "tags": ["tag1", "tag2"],\n      "links_out": [{"to": "other-slug", "type": "wikilink", "text": "display text"}],\n      "backlinks": [{"from": "other-slug", "type": "wikilink", "text": "display text"}]\n    }\n  ],\n  "graph_links": [{ "source": "slug-a", "target": "slug-b", "type": "link" }],\n  "entities": { "people": ["people/name"], "companies": ["companies/name"] },\n  "doctor": { "checks": [] },\n  "artifacts": []\n}') + '</pre>' +
-    '<h3>Data Stays Local</h3><p>Your uploaded data is stored in your browser\'s <code>localStorage</code>. Nothing is sent to any server. Use "Reset to default" in the ⚙️ menu to clear it.</p>'
+    '<h3>Data Stays Local</h3><p>Your uploaded data is stored in your browser\'s <code>localStorage</code>. Nothing is sent to any server. Use "Reset to default" in the ⚙️ menu to clear it.</p>',
   clients: `<h2>For Your Clients</h2><h3>The Pitch</h3><p>"Here's what we'll do. You keep taking notes the way you normally do. We'll set up a brain that stores all of that in a way that's searchable and connected. Then we'll give you a dashboard you can open on any device."</p><h3>What They Get</h3><ul><li><strong>Company memory</strong> that doesn't walk out when someone quits</li><li><strong>Client context</strong> at their fingertips before every call</li><li><strong>Visual map</strong> of how projects, people, and ideas connect</li><li><strong>Zero maintenance</strong> — it updates itself</li></ul>`,
   scaling: `<h2>Scaling & Limits</h2><p>This dashboard — HTML, JSON, everything — is ~440 KB total. GitHub Pages allows up to 1 GB.</p><div class="callout"><strong>53 brain pages = ~30 KB JSON.</strong> At ~0.6 KB per page, you'd need roughly 1.6 million pages to hit GitHub's 1 GB site limit.</div>`,
   shortcuts: `<h2>Keyboard Shortcuts</h2><table style="width:100%;font-size:0.78rem;border-collapse:collapse"><tr><td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04)"><span class="kbd">?</span></td><td>Open this help</td></tr><tr><td style="padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04)"><span class="kbd">Esc</span></td><td>Close modal or panel</td></tr><tr><td style="padding:8px 12px"><span class="kbd">Ctrl+K</span></td><td>Focus search</td></tr></table><h3>Graph</h3><ul><li><strong>Scroll</strong> — zoom in/out (pinch on touch)</li><li><strong>Drag background</strong> — pan</li><li><strong>Drag node</strong> — reposition</li><li><strong>Click node</strong> — open detail modal</li></ul>`
