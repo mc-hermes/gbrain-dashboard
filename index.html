@@ -743,13 +743,13 @@
   <div class="header">
     <div class="header-left">
       <h1><span>gbrain</span></h1>
-      <div class="sub">Interactive knowledge-base dashboard</div>
+      <div class="sub">Tap ⚙️ to connect your brain</div>
     </div>
     <div class="header-right">
       <span class="data-source-badge" id="dataSource" title="Data source" style="cursor:pointer" onclick="openLoadDataModal()">📄 default</span>
       <span class="last-updated" id="lastUpdated">Loading...</span>
       <button class="refresh" onclick="loadData()">↻ Refresh</button>
-      <button class="icon-btn" onclick="openLoadDataModal()" title="Load your own data"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="3" stroke="currentColor" fill="none"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      <button class="icon-btn" onclick="openLoadDataModal()" title="Load your own data"><svg viewBox="0 0 16 16" width="20" height="20"><circle cx="8" cy="8" r="3" stroke="currentColor" fill="none"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.2"/></svg></button>
     </div>
   </div>
 
@@ -844,7 +844,7 @@
           <button class="tab" data-btab="artifacts">Artifacts</button>
         </div>
         <div class="search-wrap" id="searchWrap">
-          <span class="search-icon"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="7" cy="7" r="5" stroke="currentColor" fill="none"/><path d="M11 11l4 4" stroke="currentColor"/></svg></span>
+          <span class="search-icon"><svg viewBox="0 0 16 16" width="20" height="20"><circle cx="7" cy="7" r="5" stroke="currentColor" fill="none"/><path d="M11 11l4 4" stroke="currentColor"/></svg></span>
           <input type="text" placeholder="Search pages..." id="searchInput" oninput="filterCurrent()">
         </div>
         <div id="pagesView">
@@ -961,7 +961,7 @@
 
 <!-- Floating Buttons -->
 <div class="float-btns">
-<button class="float-btn cog-btn" onclick="toggleSettings()" title="Settings"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="2.5" stroke="currentColor" fill="none"/><path d="M8 2v1.5M8 12.5v1.5M2 8h1.5M12.5 8h1.5M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor"/></svg></button>
+<button class="float-btn cog-btn" onclick="toggleSettings()" title="Settings"><svg viewBox="0 0 16 16" width="20" height="20"><circle cx="8" cy="8" r="2.5" stroke="currentColor" fill="none"/><path d="M8 2v1.5M8 12.5v1.5M2 8h1.5M12.5 8h1.5M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor"/></svg></button>
 <button class="float-btn help-btn" onclick="openDocs()" title="Help &amp; Documentation (press ?)">?</button>
 </div>
 
@@ -1050,7 +1050,7 @@
 <!-- Token Prompt -->
 <div class="token-overlay" id="tokenOverlay">
   <div class="token-dialog">
-    <h3><svg viewBox="0 0 14 14" width="14" height="14" style="vertical-align:middle;margin-right:6px"><path d="M5 7h6l2 4v2H7v-2H3l2-4zM5 7C5 4.5 3 3 3 3s2 .5 4 2c1-1.5 3-2 3-2s-2 1.5-2 4" fill="none" stroke="currentColor" stroke-linecap="round"/></svg> Token Required</h3>
+    <h3><svg viewBox="0 0 14 14" width="20" height="20" style="vertical-align:middle;margin-right:6px"><path d="M5 7h6l2 4v2H7v-2H3l2-4zM5 7C5 4.5 3 3 3 3s2 .5 4 2c1-1.5 3-2 3-2s-2 1.5-2 4" fill="none" stroke="currentColor" stroke-linecap="round"/></svg> Token Required</h3>
     <p>To save notes to your brain, enter the dashboard write token.<br>This is set once and stored on your device.</p>
     <input type="password" id="tokenInput" placeholder="Paste your write token…" onkeydown="if(event.key==='Enter')saveToken()">
     <div class="token-actions">
@@ -1405,8 +1405,8 @@ function updateDataSource() {
       badge.textContent = '⚡ MCP (empty)';
       badge.title = 'Connected to gbrain but no pages found — click to reconfigure';
     } else if (pages === 0) {
-      badge.textContent = '📄 no data';
-      badge.title = 'No data loaded — click to connect gbrain or upload';
+      badge.textContent = '⚡ Connect';
+      badge.title = 'Tap to connect gbrain or upload — click to connect gbrain or upload';
     } else if (fromUrl) {
       badge.textContent = '🔗 ' + pages + ' pages';
       badge.title = 'Loaded from: ' + fromUrl + ' — click to change';
