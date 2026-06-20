@@ -601,6 +601,77 @@
   .fc-pending-badge .spinner-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); animation: pendPulse 1.2s ease infinite; }
   @keyframes pendPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
 
+  /* ─── Tier Badges (LinkedIn CRM) ─── */
+  .tier-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em; }
+  .tier-badge.tier-1 { background: rgba(247,118,142,0.12); color: var(--rose); border: 1px solid rgba(247,118,142,0.25); }
+  .tier-badge.tier-2 { background: rgba(255,158,100,0.12); color: var(--accent-light); border: 1px solid rgba(255,158,100,0.25); }
+  .tier-badge.tier-3 { background: rgba(122,162,247,0.12); color: var(--primary); border: 1px solid rgba(122,162,247,0.25); }
+  .tier-badge.tier-4 { background: rgba(154,165,206,0.1); color: var(--text-muted); border: 1px solid rgba(154,165,206,0.2); }
+  .tier-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ─── Relationship Health (LinkedIn CRM) ─── */
+  .health-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 0.6rem; }
+  .health-indicator .hi-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .health-indicator .hi-dot.hot { background: var(--green); box-shadow: 0 0 6px rgba(158,206,106,0.5); }
+  .health-indicator .hi-dot.warm { background: var(--accent-light); }
+  .health-indicator .hi-dot.cold { background: var(--rose); }
+  .health-indicator .hi-dot.unknown { background: var(--border); }
+  .last-contact { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--text-muted); }
+
+  /* ─── Edit Mode in Modals ─── */
+  .modal-body .m-edit-field { margin-bottom: 12px; }
+  .modal-body .m-edit-field label { display: block; font-size: 0.6rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.02em; text-transform: uppercase; }
+  .modal-body .m-edit-field input, .modal-body .m-edit-field textarea {
+    width: 100%; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.78rem;
+  }
+  .modal-body .m-edit-field input:focus, .modal-body .m-edit-field textarea:focus { outline: none; border-color: var(--primary); }
+  .modal-body .m-edit-field textarea { min-height: 140px; resize: vertical; line-height: 1.6; font-size: 0.75rem; }
+  .modal-body .m-edit-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+  .modal-body .m-edit-tags .tag-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 10px; border-radius: 999px; font-size: 0.62rem; background: rgba(125,207,255,0.08); color: var(--primary-light); border: 1px solid rgba(125,207,255,0.15); }
+  .modal-body .m-edit-tags .tag-pill .tag-x { cursor: pointer; width: 14px; height: 14px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1; color: var(--text-muted); transition: all 0.15s; }
+  .modal-body .m-edit-tags .tag-pill .tag-x:hover { background: rgba(247,118,142,0.15); color: var(--rose); }
+  .modal-body .m-edit-tags .tag-add-input { background: none; border: 1px dashed var(--border); border-radius: 999px; padding: 3px 10px; color: var(--text-muted); font-size: 0.62rem; font-family: 'Inter', sans-serif; width: 100px; }
+  .modal-body .m-edit-tags .tag-add-input:focus { outline: none; border-color: var(--primary); color: var(--text); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .modal-actions button { padding: 8px 18px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+  .modal-actions .btn-save { background: var(--primary); border: none; color: #1a1b26; }
+  .modal-actions .btn-save:hover { filter: brightness(1.1); }
+  .modal-actions .btn-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+  .modal-actions .btn-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+  .modal-actions .btn-delete { background: none; border: 1px solid rgba(247,118,142,0.25); color: var(--rose); }
+  .modal-actions .btn-delete:hover { background: rgba(247,118,142,0.08); border-color: var(--rose); }
+
+  /* ─── Delete Confirmation Overlay ─── */
+  .delete-overlay { position: fixed; inset: 0; background: rgba(26,27,38,0.94); z-index: 300; display: none; align-items: center; justify-content: center; padding: 24px; }
+  .delete-overlay.active { display: flex; }
+  .delete-dialog { background: var(--surface); border: 1px solid rgba(247,118,142,0.3); border-radius: var(--radius); padding: 28px; max-width: 420px; width: 100%; text-align: center; animation: modalIn 0.15s ease; }
+  .delete-dialog h3 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--rose); margin-bottom: 8px; }
+  .delete-dialog p { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+  .delete-dialog .del-slug { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--primary-light); margin-bottom: 12px; word-break: break-all; }
+  .delete-dialog .del-actions { display: flex; gap: 8px; justify-content: center; }
+  .delete-dialog .del-actions button { padding: 8px 20px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+  .delete-dialog .del-confirm { background: var(--rose); border: none; color: #fff; }
+  .delete-dialog .del-confirm:hover { filter: brightness(1.15); }
+  .delete-dialog .del-cancel { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+  .delete-dialog .del-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* ─── Bulk Action Bar ─── */
+  .bulk-bar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--primary); border-radius: var(--radius); padding: 8px 16px; display: none; align-items: center; gap: 12px; z-index: 80; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+  .bulk-bar.active { display: flex; }
+  .bulk-bar .bulk-count { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--primary); white-space: nowrap; }
+  .bulk-bar .bulk-actions { display: flex; gap: 6px; }
+  .bulk-bar button { padding: 5px 12px; border-radius: 999px; font-size: 0.62rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; background: none; border: 1px solid var(--border); color: var(--text-muted); }
+  .bulk-bar button:hover { border-color: var(--primary); color: var(--primary); }
+  .bulk-bar .bulk-delete-btn { color: var(--rose); border-color: rgba(247,118,142,0.25); }
+  .bulk-bar .bulk-delete-btn:hover { background: rgba(247,118,142,0.08); border-color: var(--rose); }
+  .bulk-bar .bulk-clear { font-size: 0.6rem; color: var(--text-muted); cursor: pointer; background: none; border: none; }
+
+  /* ─── Select All Checkbox ─── */
+  .select-col { width: 32px; text-align: center; }
+  .select-col input[type="checkbox"] { cursor: pointer; accent-color: var(--primary); }
+  .bulk-select-all { cursor: pointer; accent-color: var(--primary); }
+
   /* ─── Token Prompt ─── */
   .token-overlay { position: fixed; inset: 0; background: rgba(26,27,38,0.94); z-index: 250; display: none; align-items: center; justify-content: center; padding: 24px; }
   .token-overlay.active { display: flex; }
@@ -829,6 +900,29 @@
   </div>
 
   <div class="footer">gbrain-dashboard · MIT License · Press <span style="font-family:'JetBrains Mono',monospace">?</span> for help</div>
+</div>
+
+<!-- Delete Confirmation Overlay -->
+<div class="delete-overlay" id="deleteOverlay" onclick="if(event.target===this)closeDeleteConfirm()">
+  <div class="delete-dialog">
+    <h3>Delete Page</h3>
+    <p>This action cannot be undone. The page and all its data will be permanently removed.</p>
+    <div class="del-slug" id="delSlug"></div>
+    <div class="del-actions">
+      <button class="del-cancel" onclick="closeDeleteConfirm()">Cancel</button>
+      <button class="del-confirm" id="delConfirmBtn" onclick="confirmDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Action Bar -->
+<div class="bulk-bar" id="bulkBar">
+  <span class="bulk-count" id="bulkCount">0 selected</span>
+  <div class="bulk-actions">
+    <button onclick="bulkAddTag()" title="Add tag to selected">+ Tag</button>
+    <button class="bulk-delete-btn" onclick="bulkDelete()" title="Delete selected">Delete</button>
+  </div>
+  <button class="bulk-clear" onclick="clearBulkSelect()">✕ Clear</button>
 </div>
 
 <!-- Mobile Bottom Navigation -->
@@ -1618,7 +1712,9 @@ function renderFeed() {
     });
     // Strip markdown from snippet: remove headings, bold/italic, blockquotes, links, wikilinks
     const snippet = p.body ? p.body.replace(/^#{1,6}\s+.*$/gm, '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/^>\s?/gm, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\[\[([^\]]+)\]\]/g, '$1').replace(/`{1,3}[^`]+`{1,3}/g, '').trim().slice(0, 120) : '';
-    return '<div class="feed-card" data-slug="' + escAttr(p.slug) + '" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">\n      <div class="fc-link-line"></div>\n      <div class="fc-header">\n        <span class="fc-type-badge ' + type + '">' + getTypeSvg(type) + ' ' + type + '</span>\n        <span class="fc-time">' + timeDisplay + '</span>\n      </div>\n      <div class="fc-title">' + esc(p.title || p.slug) + '</div>\n      ' + (linkNames.length ? '<div class="fc-links">' + linkNames.join(' · ') + '</div>' : '') + '\n      ' + (snippet ? '<div class="fc-summary">' + esc(snippet) + '</div>' : '') + '\n      ' + (p.type === 'dataset' ? '<div class="fc-meta">' + (p.row_count ? p.row_count + ' rows' : '') + (p.columns ? ' · ' + (p.columns||[]).slice(0,5).join(', ') : '') + (p.format ? ' · ' + p.format : '') + '</div>' : '') + '\n    </div>';
+    var tierBadge = p.type === 'person' ? renderTierBadge(p.tags||[]) : '';
+    var healthIndicator = p.type === 'person' ? renderHealthIndicator(p) : '';
+    return '<div class="feed-card" data-slug="' + escAttr(p.slug) + '" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">\n      <div class="fc-link-line"></div>\n      <div class="fc-header">\n        <span class="fc-type-badge ' + type + '">' + getTypeSvg(type) + ' ' + type + '</span>\n        ' + (tierBadge ? tierBadge : '') + '\n        ' + (healthIndicator ? '<span style="margin-left:4px">' + healthIndicator + '</span>' : '') + '\n        <span class="fc-time">' + timeDisplay + '</span>\n      </div>\n      <div class="fc-title">' + esc(p.title || p.slug) + '</div>\n      ' + (linkNames.length ? '<div class="fc-links">' + linkNames.join(' · ') + '</div>' : '') + '\n      ' + (snippet ? '<div class="fc-summary">' + esc(snippet) + '</div>' : '') + '\n      ' + (p.type === 'dataset' ? '<div class="fc-meta">' + (p.row_count ? p.row_count + ' rows' : '') + (p.columns ? ' · ' + (p.columns||[]).slice(0,5).join(', ') : '') + (p.format ? ' · ' + p.format : '') + '</div>' : '') + '\n    </div>';
   }).join('');
   setupDrawInAnimation();
 }
@@ -2140,13 +2236,16 @@ function renderPages(filter) {
     document.getElementById('pagesTable').innerHTML = '<div class="empty"><p>No pages match</p></div>';
     return;
   }
-  document.getElementById('pagesTable').innerHTML = `<table><thead><tr><th>Page</th><th>Type</th><th>Links</th><th>Updated</th></tr></thead><tbody>${
+  document.getElementById('pagesTable').innerHTML = `<table><thead><tr><th class="select-col"><input type="checkbox" class="bulk-select-all" id="bulkSelectAll" onchange="selectAllPages(this.checked)" title="Select all"></th><th>Page</th><th>Type</th><th>Links</th><th>Tier</th><th>Updated</th></tr></thead><tbody>${
     pages.map(p => {
       const lc = p.outbound_count + p.inbound_count;
-      return `<tr class="page-row" onclick="openPageModal('${escAttr(p.slug)}')">
-        <td><span class="slug-link">${esc(p.slug)}</span><br><span style="font-size:0.65rem;color:var(--text-muted)">${esc(p.title||'')}</span></td>
+      const tierHtml = p.type === 'person' ? renderTierBadge(p.tags) : '';
+      return `<tr class="page-row" onclick="if(!event.target.closest('.select-col'))openPageModal('${escAttr(p.slug)}')">
+        <td class="select-col" onclick="event.stopPropagation()"><input type="checkbox" class="bulk-checkbox" data-slug="${escAttr(p.slug)}" onchange="toggleBulkSelect('${escAttr(p.slug)}',this.checked)"></td>
+        <td><span class="slug-link" onclick="event.stopPropagation();openPageModal('${escAttr(p.slug)}')">${esc(p.slug)}</span><br><span style="font-size:0.65rem;color:var(--text-muted)">${esc(p.title||'')}</span></td>
         <td><span class="type-tag ${p.type||'concept'}">${p.type||'concept'}</span></td>
         <td><span class="link-badge ${lc>0?'has-links':''}">${lc>0 ? '🔗 '+lc : '—'}</span></td>
+        <td>${tierHtml || '—'}</td>
         <td>${p.updated||''}</td>
       </tr>`;
     }).join('')
@@ -2316,16 +2415,20 @@ function renderEntities() {
   document.getElementById('entityGrid').innerHTML = all.map(e => {
     const preview = (e.body||'').slice(0, 120).replace(/[#*`]/g,'').trim();
     const contact = [];
-    if (e.email) contact.push(`✉ ${e.email}`);
-    if (e.phone) contact.push(`📞 ${e.phone}`);
-    return `<div class="entity-card" onclick="openPageModal('${escAttr(e.slug)}')">
-      <span style="font-size:1.4rem;float:right;opacity:0.4">${e.icon}</span>
-      <div class="name">${esc(e.title)}</div>
-      <div class="slug">${esc(e.slug)}</div>
-      ${contact.length ? `<div class="contact-row">${contact.join(' · ')}</div>` : ''}
-      ${preview ? `<div class="preview">${esc(preview)}</div>` : ''}
-      <div class="meta"><span class="type-tag ${e.entityType}">${e.entityType}</span>${(e.tags||[]).slice(0,3).map(t=>`<span class="tag" style="font-size:0.55rem;padding:1px 7px;border-radius:10px;background:rgba(148,163,184,0.1);color:var(--text-muted)">${esc(t)}</span>`).join('')}</div>
-    </div>`;
+    if (e.email) contact.push('✉ ' + esc(e.email));
+    if (e.phone) contact.push('📞 ' + esc(e.phone));
+    var tierHtml = e.entityType === 'person' ? renderTierBadge(e.tags||[]) : '';
+    var healthHtml = e.entityType === 'person' ? renderHealthIndicator(e) : '';
+    var lastContact = e.entityType === 'person' ? getLastContactDate(e) : '';
+    return '<div class="entity-card" onclick="openPageModal(\'' + escAttr(e.slug) + '\')">' +
+      (tierHtml ? '<div style="margin-bottom:4px">' + tierHtml + '</div>' : '') +
+      '<div class="name">' + esc(e.title) + '</div>' +
+      '<div class="slug">' + esc(e.slug) + '</div>' +
+      (contact.length ? '<div class="contact-row">' + contact.join(' · ') + '</div>' : '') +
+      (healthHtml || lastContact ? '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">' + healthHtml + (lastContact ? '<span class="last-contact">' + esc(lastContact) + '</span>' : '') + '</div>' : '') +
+      (preview ? '<div class="preview">' + esc(preview) + '</div>' : '') +
+      '<div class="meta"><span class="type-tag ' + e.entityType + '">' + e.entityType + '</span>' + (e.tags||[]).slice(0,3).map(function(t){return '<span class="tag" style="font-size:0.55rem;padding:1px 7px;border-radius:10px;background:rgba(148,163,184,0.1);color:var(--text-muted)">' + esc(t) + '</span>';}).join('') + '</div>' +
+    '</div>';
   }).join('');
   setupDrawInAnimation();
 }
@@ -2411,10 +2514,35 @@ function openPageModal(slug) {
       .catch(function() { closeModal(); });
     return;
   }
+  DATA._lastViewedSlug = slug;
   let html = '';
+
+  // LinkedIn CRM section for person pages
+  if (page.type === 'person') {
+    var tierHtml = renderTierBadge(page.tags);
+    var healthHtml = renderHealthIndicator(page);
+    var lastContact = getLastContactDate(page);
+    if (tierHtml || healthHtml || lastContact) {
+      html += '<div class="m-section"><div class="m-section-title">Relationship</div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+      if (tierHtml) html += tierHtml;
+      if (healthHtml) html += healthHtml;
+      if (lastContact) html += '<span class="last-contact">Last: ' + esc(lastContact) + '</span>';
+      html += '</div></div>';
+    }
+  }
+
+  // Tags with remove buttons
   if ((page.tags||[]).length) {
-    html += `<div class="m-section"><div class="m-section-title">Tags</div>
-      <div class="m-tags">${page.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>`;
+    html += '<div class="m-section"><div class="m-section-title">Tags</div><div class="m-tags" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
+    page.tags.forEach(function(t) {
+      html += '<span class="tag-pill">' + esc(t) + '<span class="tag-x" onclick="event.stopPropagation();removeTag(\'' + escAttr(slug) + '\',\'' + escAttr(t) + '\')" title="Remove tag">×</span></span>';
+    });
+    html += '<input type="text" class="tag-add-input" id="modalTagInput" placeholder="+ tag" onkeydown="if(event.key===\'Enter\'){addTagToPage(\'' + escAttr(slug) + '\',this.value);this.value=\'\';}" style="width:80px;margin-left:4px">';
+    html += '</div></div>';
+  } else {
+    html += '<div class="m-section"><div class="m-section-title">Tags</div><div class="m-tags" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">';
+    html += '<input type="text" class="tag-add-input" id="modalTagInput" placeholder="+ tag" onkeydown="if(event.key===\'Enter\'){addTagToPage(\'' + escAttr(slug) + '\',this.value);this.value=\'\';}" style="width:80px">';
+    html += '</div></div>';
   }
   if (page.type === 'person' || page.type === 'company') {
     const fields = [];
@@ -2452,6 +2580,9 @@ function openPageModal(slug) {
         <span class="dir">←</span><span>${esc(l.from)}</span><span class="ltype">${esc(l.type)}</span>
       </div>`).join('')}</div></div>`;
   }
+  // Action buttons
+  html += '<div class="modal-actions"><button class="btn-save" onclick="openEditModal(\'' + escAttr(slug) + '\')">✏ Edit</button><button class="btn-delete" onclick="deletePage(\'' + escAttr(slug) + '\')">Delete</button></div>';
+
   openModal(page.title, page.slug, html);
 }
 
@@ -2495,6 +2626,415 @@ function navigateTo(slug) {
   slug = slug.replace(/^(people|companies|concepts|meetings|architecture|reference|brand)\//,'');
   const page = (DATA.pages||[]).find(p => p.slug === slug || p.slug.endsWith('/'+slug));
   if (page) { closeModal(); setTimeout(() => openPageModal(page.slug), 100); }
+}
+
+// ─── CRUD: EDIT MODE ───
+var _editSlug = null;
+var _editTags = [];
+
+function openEditModal(slug) {
+  const page = (DATA.pages||[]).find(p => p.slug === slug);
+  if (!page) return;
+  _editSlug = slug;
+  _editTags = (page.tags||[]).slice();
+
+  var html = '<div class="m-edit-field"><label>Title</label><input type="text" id="editTitle" value="' + escAttr(page.title || '') + '"></div>';
+  html += '<div class="m-edit-field"><label>Content (Markdown)</label><textarea id="editBody">' + esc(page.body || '') + '</textarea></div>';
+
+  if (page.type === 'person' || page.type === 'company') {
+    html += '<div class="m-section-title" style="margin-top:12px">Details</div><div class="m-entity-fields">';
+    var fields = [
+      {id:'editEmail', label:'Email', val:page.email||''},
+      {id:'editPhone', label:'Phone', val:page.phone||''},
+      {id:'editCompany', label:'Company', val:page.company_name||''},
+      {id:'editWebsite', label:'Website', val:page.website||''},
+      {id:'editLocation', label:'Location', val:page.location||''},
+      {id:'editRelationship', label:'Relationship', val:page.relationship||''}
+    ];
+    fields.forEach(function(f) {
+      html += '<div class="m-edit-field"><label>' + esc(f.label) + '</label><input type="text" id="' + f.id + '" value="' + escAttr(f.val) + '"></div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="m-edit-field"><label>Tags</label><div class="m-edit-tags" id="editTagList">' + renderEditTags() + '</div></div>';
+  html += '<div class="modal-actions"><button class="btn-save" onclick="saveEdit()">Save Changes</button><button class="btn-cancel" onclick="cancelEdit()">Cancel</button></div>';
+
+  openModal('Edit: ' + (page.title || page.slug), page.slug, html);
+  setTimeout(function() {
+    var titleEl = document.getElementById('editTitle');
+    if (titleEl) titleEl.focus();
+  }, 200);
+}
+
+function renderEditTags() {
+  var html = '';
+  _editTags.forEach(function(t, i) {
+    html += '<span class="tag-pill">' + esc(t) + '<span class="tag-x" onclick="removeEditTag(' + i + ')">×</span></span>';
+  });
+  html += '<input type="text" class="tag-add-input" id="tagAddInput" placeholder="+ tag" onkeydown="if(event.key===\'Enter\')addEditTag()" onblur="addEditTag()">';
+  return html;
+}
+
+function addEditTag() {
+  var input = document.getElementById('tagAddInput');
+  if (!input) return;
+  var tag = input.value.trim();
+  if (!tag) return;
+  if (_editTags.indexOf(tag) === -1) {
+    _editTags.push(tag);
+    var list = document.getElementById('editTagList');
+    if (list) list.innerHTML = renderEditTags();
+  }
+  input.value = '';
+  setTimeout(function() {
+    var inp = document.getElementById('tagAddInput');
+    if (inp) inp.focus();
+  }, 50);
+}
+
+function removeEditTag(idx) {
+  _editTags.splice(idx, 1);
+  var list = document.getElementById('editTagList');
+  if (list) list.innerHTML = renderEditTags();
+}
+
+function cancelEdit() {
+  _editSlug = null;
+  _editTags = [];
+  if (DATA._lastViewedSlug) {
+    closeModal();
+    setTimeout(function() { openPageModal(DATA._lastViewedSlug); }, 100);
+  } else {
+    closeModal();
+  }
+}
+
+async function saveEdit() {
+  var title = document.getElementById('editTitle').value.trim();
+  var body = document.getElementById('editBody').value.trim();
+  var slug = _editSlug;
+  if (!slug) return;
+
+  var putArgs = { slug: slug, title: title || slug, body: body, tags: _editTags };
+
+  // Collect entity fields
+  if (document.getElementById('editEmail')) {
+    var entityFields = {};
+    var fids = ['editEmail','editPhone','editCompany','editWebsite','editLocation','editRelationship'];
+    var fkeys = ['email','phone','company_name','website','location','relationship'];
+    fids.forEach(function(fid, i) {
+      var el = document.getElementById(fid);
+      if (el && el.value.trim()) entityFields[fkeys[i]] = el.value.trim();
+    });
+    putArgs.entity_fields = entityFields;
+  }
+
+  // Try MCP first
+  if (MCP_CONNECTED && MCP_URL) {
+    try {
+      await mcpCall('put_page', putArgs);
+      // Refresh local DATA
+      var page = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+      if (page) {
+        page.title = title || page.title;
+        page.body = body;
+        page.tags = _editTags;
+        if (putArgs.entity_fields) {
+          Object.keys(putArgs.entity_fields).forEach(function(k) {
+            page[k] = putArgs.entity_fields[k];
+          });
+        }
+      }
+      _editSlug = null; _editTags = [];
+      closeModal();
+      setTimeout(function() { openPageModal(slug); }, 150);
+      return;
+    } catch(e) {
+      console.warn('MCP save failed, trying API fallback:', e.message);
+    }
+  }
+
+  // API fallback
+  var API_BASE = localStorage.getItem('gbrain-write-api') || 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+  try {
+    var r = await fetch(API_BASE + '/api/pages/' + encodeURIComponent(slug), {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (WRITE_TOKEN || '')},
+      body: JSON.stringify(putArgs)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    // Update local data
+    var page = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+    if (page) {
+      page.title = title || page.title;
+      page.body = body;
+      page.tags = _editTags;
+      if (putArgs.entity_fields) {
+        Object.keys(putArgs.entity_fields).forEach(function(k) { page[k] = putArgs.entity_fields[k]; });
+      }
+    }
+  } catch(e) {
+    // Offline edit: just update local DATA
+    var page2 = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+    if (page2) {
+      page2.title = title || page2.title;
+      page2.body = body;
+      page2.tags = _editTags;
+      if (putArgs.entity_fields) {
+        Object.keys(putArgs.entity_fields).forEach(function(k) { page2[k] = putArgs.entity_fields[k]; });
+      }
+    }
+  }
+
+  _editSlug = null; _editTags = [];
+  closeModal();
+  setTimeout(function() { openPageModal(slug); }, 150);
+  reRenderAll();
+}
+
+// ─── CRUD: DELETE ───
+var _deleteSlug = null;
+
+function deletePage(slug) {
+  _deleteSlug = slug;
+  document.getElementById('delSlug').textContent = slug;
+  document.getElementById('deleteOverlay').classList.add('active');
+}
+
+function closeDeleteConfirm() {
+  _deleteSlug = null;
+  document.getElementById('deleteOverlay').classList.remove('active');
+}
+
+async function confirmDelete() {
+  var slug = _deleteSlug;
+  if (!slug) return;
+  document.getElementById('delConfirmBtn').disabled = true;
+  document.getElementById('delConfirmBtn').textContent = 'Deleting…';
+
+  var success = false;
+
+  // Try MCP
+  if (MCP_CONNECTED && MCP_URL) {
+    try {
+      await mcpCall('delete_page', { slug: slug });
+      success = true;
+    } catch(e) {
+      console.warn('MCP delete failed:', e.message);
+    }
+  }
+
+  // API fallback
+  if (!success) {
+    var API_BASE = localStorage.getItem('gbrain-write-api') || 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
+    try {
+      var r = await fetch(API_BASE + '/api/pages/' + encodeURIComponent(slug), {
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + (WRITE_TOKEN || '')}
+      });
+      if (r.ok) success = true;
+    } catch(e) {}
+  }
+
+  // Always update local DATA (offline-friendly)
+  if (DATA.pages) {
+    DATA.pages = DATA.pages.filter(function(p) { return p.slug !== slug; });
+    DATA.summary.page_count = DATA.pages.length;
+    DATA.summary.person_count = DATA.pages.filter(function(p){return p.type==='person'}).length;
+    DATA.summary.company_count = DATA.pages.filter(function(p){return p.type==='company'}).length;
+    DATA.summary.meeting_count = DATA.pages.filter(function(p){return p.type==='meeting'}).length;
+    DATA.summary.concept_count = DATA.pages.filter(function(p){return p.type==='concept'}).length;
+  }
+
+  closeDeleteConfirm();
+  closeModal();
+  reRenderAll();
+}
+
+// ─── CRUD: TAG MANAGEMENT ───
+function removeTag(slug, tag) {
+  var page = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+  if (!page || !page.tags) return;
+  page.tags = page.tags.filter(function(t) { return t !== tag; });
+
+  if (MCP_CONNECTED && MCP_URL) {
+    try { mcpCall('remove_tag', { slug: slug, tag: tag }); } catch(e) {}
+  }
+  reRenderAll();
+  closeModal();
+  setTimeout(function() { openPageModal(slug); }, 100);
+}
+
+function addTagToPage(slug, tag) {
+  if (!tag) return;
+  var page = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+  if (!page) return;
+  if (!page.tags) page.tags = [];
+  if (page.tags.indexOf(tag) !== -1) return;
+  page.tags.push(tag);
+
+  if (MCP_CONNECTED && MCP_URL) {
+    try { mcpCall('add_tag', { slug: slug, tag: tag }); } catch(e) {}
+  }
+  reRenderAll();
+  closeModal();
+  setTimeout(function() { openPageModal(slug); }, 100);
+}
+
+// ─── LINKEDIN CRM: TIER & HEALTH ───
+function getTier(tags) {
+  if (!tags) return null;
+  for (var i = 0; i < tags.length; i++) {
+    var m = tags[i].match(/^tier-([1-4])$/i);
+    if (m) return parseInt(m[1]);
+  }
+  return null;
+}
+
+function getRelationshipHealth(page) {
+  if (!page || page.type !== 'person') return 'unknown';
+  // Check for last-contact in body
+  var body = page.body || '';
+  var lcMatch = body.match(/Last contact:?\s*(.+)/i);
+  if (!lcMatch) {
+    // Check tags for recency indicators
+    var tags = page.tags || [];
+    if (tags.indexOf('active') !== -1 || tags.indexOf('recent') !== -1) return 'hot';
+    if (tags.indexOf('dormant') !== -1 || tags.indexOf('cold') !== -1) return 'cold';
+    return 'unknown';
+  }
+  var lcStr = lcMatch[1].trim();
+  // Parse date-like parts
+  var dateMatch = lcStr.match(/(\w+ \d+,? \d{4})|(\d{4}-\d{2}-\d{2})|(\w+ \d{4})/);
+  if (!dateMatch) return 'warm';
+  try {
+    var d = new Date(dateMatch[0]);
+    if (isNaN(d.getTime())) return 'warm';
+    var days = Math.floor((Date.now() - d.getTime()) / 86400000);
+    if (days <= 7) return 'hot';
+    if (days <= 30) return 'warm';
+    return 'cold';
+  } catch(e) {
+    return 'warm';
+  }
+}
+
+function renderTierBadge(tags) {
+  var tier = getTier(tags);
+  if (!tier) return '';
+  return '<span class="tier-badge tier-' + tier + '"><span class="tier-dot"></span>T' + tier + '</span>';
+}
+
+function renderHealthIndicator(page) {
+  if (page.type !== 'person') return '';
+  var health = getRelationshipHealth(page);
+  var labels = {hot:'Active', warm:'Warm', cold:'Dormant', unknown:''};
+  var label = labels[health] || '';
+  return '<span class="health-indicator"><span class="hi-dot ' + health + '"></span>' + (label ? esc(label) : '') + '</span>';
+}
+
+// Extract last contact date from page body
+function getLastContactDate(page) {
+  if (!page || page.type !== 'person') return '';
+  var body = page.body || '';
+  var m = body.match(/Last contact:?\s*(.+)/i);
+  return m ? m[1].trim().replace(/\n.*/, '').substring(0, 20) : '';
+}
+
+// ─── BULK OPERATIONS ───
+var _bulkSelected = [];
+
+function toggleBulkSelect(slug, checked) {
+  if (checked) {
+    if (_bulkSelected.indexOf(slug) === -1) _bulkSelected.push(slug);
+  } else {
+    _bulkSelected = _bulkSelected.filter(function(s) { return s !== slug; });
+  }
+  updateBulkBar();
+}
+
+function selectAllPages(checked) {
+  var checkboxes = document.querySelectorAll('.bulk-checkbox');
+  _bulkSelected = [];
+  checkboxes.forEach(function(cb) {
+    cb.checked = checked;
+    if (checked) _bulkSelected.push(cb.getAttribute('data-slug'));
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  var bar = document.getElementById('bulkBar');
+  var count = document.getElementById('bulkCount');
+  count.textContent = _bulkSelected.length + ' selected';
+  if (_bulkSelected.length > 0) {
+    bar.classList.add('active');
+  } else {
+    bar.classList.remove('active');
+  }
+}
+
+function clearBulkSelect() {
+  _bulkSelected = [];
+  document.querySelectorAll('.bulk-checkbox').forEach(function(cb) { cb.checked = false; });
+  var selectAll = document.getElementById('bulkSelectAll');
+  if (selectAll) selectAll.checked = false;
+  updateBulkBar();
+}
+
+function bulkAddTag() {
+  var tag = prompt('Tag to add to ' + _bulkSelected.length + ' pages:');
+  if (!tag || !tag.trim()) return;
+  tag = tag.trim();
+  _bulkSelected.forEach(function(slug) {
+    var page = (DATA.pages||[]).find(function(p) { return p.slug === slug; });
+    if (page) {
+      if (!page.tags) page.tags = [];
+      if (page.tags.indexOf(tag) === -1) page.tags.push(tag);
+    }
+  });
+  if (MCP_CONNECTED && MCP_URL) {
+    _bulkSelected.forEach(function(slug) {
+      try { mcpCall('add_tag', { slug: slug, tag: tag }); } catch(e) {}
+    });
+  }
+  clearBulkSelect();
+  reRenderAll();
+  showView('browse');
+  showBrowseTab('pages');
+}
+
+function bulkDelete() {
+  if (!confirm('Delete ' + _bulkSelected.length + ' pages? This cannot be undone.')) return;
+  _bulkSelected.forEach(function(slug) {
+    if (MCP_CONNECTED && MCP_URL) {
+      try { mcpCall('delete_page', { slug: slug }); } catch(e) {}
+    }
+    DATA.pages = (DATA.pages||[]).filter(function(p) { return p.slug !== slug; });
+  });
+  DATA.summary.page_count = DATA.pages.length;
+  clearBulkSelect();
+  reRenderAll();
+  showView('browse');
+  showBrowseTab('pages');
+}
+
+function reRenderAll() {
+  renderStats();
+  renderDigest();
+  renderFeed();
+  pagesRendered = false;
+  entitiesRendered = false;
+  healthRendered = false;
+  graphRendered = false;
+  artifactsRendered = false;
+  if (activeView === 'browse') {
+    if (activeTab === 'pages') { renderPages(); pagesRendered = true; }
+    if (activeTab === 'entities') { renderEntities(); entitiesRendered = true; }
+  }
+  if (activeView === 'today') { renderFeed(); }
+  if (activeView === 'graph') { initGraph(); drawGraph(); graphRendered = true; }
 }
 
 // ─── FILTERS ───
