@@ -10,10 +10,21 @@ Connect it directly to your running gbrain, upload a JSON file, or load from a U
 
 ### If you run gbrain MCP
 
-1. Start gbrain: `gbrain serve --http`
+The dashboard connects directly to your running gbrain for live access to your knowledge base. You'll need two things: a **URL** (where your gbrain lives) and an **access token** (like a password).
+
+**Getting your access token depends on where gbrain is running:**
+
+- **🖥️ On your own computer (local):** When you run `gbrain serve --http`, it prints a bootstrap token in the terminal. Copy it — that's your access token. Your URL is `http://localhost:3131/mcp` (unless you changed the port with `--port`).
+- **☁️ On a server (VPS / remote):** Ask whoever runs the server for the MCP URL and an access token. They'll generate one from the gbrain admin panel at `https://<server-address>/admin`.
+
+> 💡 **Are you the server admin?** Log into your gbrain's admin panel at `https://<your-server>/admin`, register an OAuth client, and generate a `read`-scoped access token. Send the MCP URL and token to your user.
+
+**Connecting the dashboard:**
+
+1. Start gbrain (if local): `gbrain serve --http`
 2. Open `index.html` in your browser
-3. Click the ⚙️ gear icon in the top-right corner
-4. Enter your MCP URL (like `http://localhost:3131/mcp`) and your access token
+3. Click the data badge in the top-right corner (look for 📄 or ⚡, next to the gear icon)
+4. Enter your MCP URL and access token
 5. Click **Connect to gbrain**
 
 Your dashboard loads live from your brain. The connection is saved so it works again next time you open the page — no reconnecting needed.
