@@ -809,8 +809,8 @@
         <div id="pendingNotes"></div>
         <div id="feedCards"></div>
         <div class="empty-state" id="feedEmpty" style="display:none">
-          <div class="empty-title">No pages yet</div>
-          <div class="empty-desc">Click the ⚙️ gear icon to connect your gbrain brain or upload data.</div>
+          <div class="empty-title">Connect your brain</div>
+          <div class="empty-desc">Tap the ⚙️ gear icon above, or use the <b>Connect to gbrain</b> button below.</div>
         </div>
       </div>
     </div>
@@ -1308,6 +1308,25 @@ async function loadData(source) {
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('error').style.display = 'none';
+  
+  // Show connect prompt in loading state for new users
+  var loadMsg = document.querySelector('#loading');
+  if (loadMsg) loadMsg.innerHTML = '<div class="spinner"></div> Loading dashboard...<br><small style="font-size:0.7rem;margin-top:12px;color:var(--text-muted);cursor:pointer" onclick="openLoadDataModal()">⚡ <span style="color:var(--primary-light);text-decoration:underline">Connect to gbrain</span> or upload data</small>';
+  
+  // Helper: fetch with timeout
+  async function fetchWithTimeout(url, opts, ms) {
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, ms || 10000);
+    try {
+      var resp = await fetch(url, Object.assign({}, opts || {}, { signal: controller.signal }));
+      clearTimeout(timer);
+      return resp;
+    } catch(e) {
+      clearTimeout(timer);
+      throw e;
+    }
+  }
+  
   try {
     var data = null;
 
@@ -1322,7 +1341,7 @@ async function loadData(source) {
         data = source;
         localStorage.setItem('gbrain-custom-data', JSON.stringify(data));
       } else if (typeof source === 'string') {
-        var res = await fetch(source);
+        var res = await fetchWithTimeout(source, null, 8000);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         data = await res.json();
         localStorage.setItem('gbrain-custom-data', JSON.stringify(data));
@@ -1342,7 +1361,7 @@ async function loadData(source) {
       var params = new URLSearchParams(window.location.search);
       var urlSource = params.get('source');
       if (urlSource) {
-        var res2 = await fetch(urlSource);
+        var res2 = await fetchWithTimeout(urlSource, null, 8000);
         if (!res2.ok) throw new Error('HTTP ' + res2.status);
         data = await res2.json();
         localStorage.setItem('gbrain-custom-data', JSON.stringify(data));
@@ -1351,7 +1370,7 @@ async function loadData(source) {
 
     // Priority 4: default
     if (!data) {
-      var res3 = await fetch('gbrain-data.json');
+      var res3 = await fetchWithTimeout('gbrain-data.json', null, 8000);
       if (!res3.ok) throw new Error('HTTP ' + res3.status);
       data = await res3.json();
     }
@@ -1364,7 +1383,7 @@ async function loadData(source) {
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'block';
-    document.getElementById('errorMsg').textContent = 'Failed to load: ' + e.message;
+    document.getElementById('errorMsg').innerHTML = 'Failed to load: ' + e.message + '<br><br><button onclick="openLoadDataModal()" style="padding:8px 20px;background:var(--primary);border:none;border-radius:999px;color:#1a1b26;font-size:0.75rem;font-weight:600;cursor:pointer;margin-top:8px">⚡ Connect to gbrain</button>';
   }
 }
 
