@@ -19,6 +19,38 @@ The dashboard connects directly to your running gbrain for live access to your k
 
 > 💡 **Are you the server admin?** Log into your gbrain's admin panel at `https://<your-server>/admin`, register an OAuth client, and generate a `read`-scoped access token. Send the MCP URL and token to your user.
 
+#### 📱 Using the dashboard on your phone (or any device outside your home network)
+
+If your gbrain runs on a remote server, your phone's browser can't reach it directly — `localhost` and private IPs won't work. **[Tailscale](https://tailscale.com/download)** creates a private network (a "tailnet") that connects all your devices securely, no matter where they are.
+
+**Setup (one time):**
+
+1. **Install Tailscale on your gbrain server:**
+   ```bash
+   curl -fsSL https://tailscale.com/install.sh | sh
+   sudo tailscale up
+   ```
+
+2. **Install Tailscale on your phone** from the App Store or Google Play, and sign in with the same account.
+
+3. **Find your server's Tailscale address.** On the server, run:
+   ```bash
+   tailscale status
+   ```
+   Look for your server's hostname — it'll be something like `vm-0-8-ubuntu.tail25fd51.ts.net`. That's your MCP URL base.
+
+4. **Construct your MCP URL:**
+   ```
+   http://<tailscale-hostname>:<port>/mcp
+   ```
+   For example: `http://vm-0-8-ubuntu.tail25fd51.ts.net:8787/mcp`
+
+5. Open the dashboard on your phone, click the data badge (⚡ or 📄 in the top-right corner), and enter:
+   - **MCP URL:** your Tailscale address from step 4
+   - **Access token:** your gbrain bearer token
+
+> 🔒 **Security note:** Tailscale traffic is end-to-end encrypted via WireGuard. Your gbrain data never touches the public internet. For extra security, keep your gbrain server's firewall closed to the public — Tailscale handles access through its private mesh.
+
 **Connecting the dashboard:**
 
 1. Start gbrain (if local): `gbrain serve --http`
