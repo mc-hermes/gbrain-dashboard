@@ -1008,7 +1008,189 @@ let pagesRendered = false;
 let entitiesRendered = false;
 let healthRendered = false;
 let artifactsRendered = false;
-let logsRendered = false;
+// ─── MCP CLIENT ─────────────────────────────────────────────────────────
+var MCP_URL = null;
+var MCP_TOKEN = null;
+var MCP_CONNECTED = false;
+
+function mcpCall(method, args) {
+  return fetch(MCP_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + MCP_TOKEN
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'tools/call',
+      params: { name: method, arguments: args || {} },
+      id: Date.now()
+    })
+  }).then(function(r) {
+    if (!r.ok) throw new Error('MCP HTTP ' + r.status);
+    return r.json();
+  }).then(function(d) {
+    if (d.error) throw new Error((d.error.message || 'MCP error'));
+    // Parse the content[0].text JSON string
+    var content = d.result && d.result.content;
+    if (content && content[0] && content[0].text) {
+      try {
+        return JSON.parse(content[0].text);
+      } catch(e) {
+        return content[0].text; // Return raw if not JSON
+      }
+    }
+    return d.result;
+  });
+}
+
+async function mcpInit(url, token) {
+  MCP_URL = url;
+  MCP_TOKEN = token;
+  // Initialize MCP session
+  var r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'initialize',
+      params: {
+        protocolVersion: '2024-11-05',
+        capabilities: {},
+        clientInfo: { name: 'gbrain-dashboard', version: '1.0.0' }
+      },
+      id: 1
+    })
+  });
+  var d = await r.json();
+  if (d.error) throw new Error('Init failed: ' + (d.error.message || JSON.stringify(d.error)));
+  // Send initialized notification
+  await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })
+  });
+  MCP_CONNECTED = true;
+  return d.result;
+}
+
+async function loadFromMCP() {
+  if (!MCP_URL || !MCP_TOKEN) throw new Error('MCP not configured');
+
+  // Initialize MCP session if not yet connected this page load
+  if (!MCP_CONNECTED) {
+    try { await mcpInit(MCP_URL, MCP_TOKEN); } catch(e) {
+      // Init failed — maybe the session is still alive, try anyway
+    }
+  }
+
+  // 1. Get all pages
+  var pagesResult = await mcpCall('list_pages', { limit: 500 });
+  var rawPages = pagesResult.pages || pagesResult || [];
+  var pages = rawPages.map(function(p) {
+    return {
+      slug: p.slug || '',
+      title: p.title || '',
+      type: p.type || 'concept',
+      body: p.body || '',
+      tags: p.tags || [],
+      links_out: (p.links_out || []).map(function(l) {
+        return { to: l.to_slug || l.to || '', type: l.link_type || 'link', text: l.context || '' };
+      }),
+      backlinks: [],
+      outbound_count: (p.links_out || []).length,
+      inbound_count: p.backlink_count || 0
+    };
+  });
+
+  // 2. Get stats
+  var stats = await mcpCall('get_stats', {});
+
+  // 3. Get doctor report
+  var doctor;
+  try { doctor = await mcpCall('run_doctor', {}); } catch(e) { doctor = null; }
+
+  // 4. Build graph_links from per-page get_links (batched in groups of 10)
+  var graphLinks = [];
+  var seenLinks = {};
+  for (var i = 0; i < pages.length; i += 10) {
+    var batch = pages.slice(i, i + 10);
+    var results = await Promise.all(batch.map(function(p) {
+      return mcpCall('get_links', { slug: p.slug }).catch(function() { return { links: [] }; });
+    }));
+    results.forEach(function(r) {
+      (r.links || []).forEach(function(l) {
+        var key = (l.from_slug || '') + '→' + (l.to_slug || '');
+        if (!seenLinks[key]) {
+          seenLinks[key] = true;
+          graphLinks.push({
+            source: l.from_slug || '',
+            target: l.to_slug || '',
+            type: l.link_type || 'link'
+          });
+        }
+      });
+    });
+  }
+
+  // 5. Build entities
+  var people = [], companies = [];
+  pages.forEach(function(p) {
+    if (p.type === 'person') people.push(p.slug);
+    if (p.type === 'company') companies.push(p.slug);
+  });
+
+  // 6. Build doctor checks
+  var checks = [];
+  if (doctor && doctor.checks) {
+    checks = doctor.checks.map(function(c) {
+      return {
+        name: c.name || c.check || '',
+        status: c.status || c.result || 'unknown',
+        category: c.category || '',
+        message: c.message || c.detail || ''
+      };
+    });
+  }
+
+  // 7. Assemble
+  return {
+    updated_at: new Date().toISOString(),
+    summary: {
+      page_count: pages.length,
+      concept_count: 0,
+      person_count: people.length,
+      company_count: companies.length,
+      meeting_count: 0,
+      newsletter_count: 0,
+      article_count: 0,
+      bookmark_count: 0,
+      digest_count: 0,
+      dataset_count: 0,
+      total_links: graphLinks.length,
+      inbound_count: 0,
+      outbound_count: graphLinks.length,
+      graph_coverage: graphLinks.length ? Math.round(graphLinks.length / pages.length * 100) + '% of pages have graph links' : '0%',
+      embed_coverage: (stats && stats.embed_coverage) || '—',
+      entity_links: '—',
+      score: (stats && stats.brain_score) ? String(stats.brain_score) : '—',
+      score_label: '/100',
+      score_breakdown: (stats && stats.score_breakdown) || 'Live MCP data',
+      artifact_count: 0,
+      checks_passed: checks.filter(function(c) { return c.status === 'pass'; }).length,
+      checks_warned: checks.filter(function(c) { return c.status === 'warn'; }).length,
+      checks_failed: checks.filter(function(c) { return c.status === 'fail'; }).length
+    },
+    pages: pages,
+    graph_links: graphLinks,
+    entities: { people: people, companies: companies },
+    doctor: { summary: (doctor && doctor.summary) || 'MCP health report', checks: checks },
+    artifacts: [],
+    _mcpSource: true
+  };
+}
+
+var DATA = null;
 
 async function loadData(source) {
   document.getElementById('loading').style.display = 'flex';
@@ -1017,8 +1199,13 @@ async function loadData(source) {
   try {
     var data = null;
 
-    // Priority 1: source argument (called with parsed object or URL string)
-    if (source) {
+    // Priority 0: MCP connection (live, always wins)
+    if (MCP_CONNECTED && MCP_URL && MCP_TOKEN) {
+      data = await loadFromMCP();
+    }
+
+    // Priority 1: source argument
+    if (!data && source) {
       if (typeof source === 'object') {
         data = source;
         localStorage.setItem('gbrain-custom-data', JSON.stringify(data));
@@ -1030,7 +1217,7 @@ async function loadData(source) {
       }
     }
 
-    // Priority 2: localStorage (previously uploaded)
+    // Priority 2: localStorage
     if (!data) {
       var cached = localStorage.getItem('gbrain-custom-data');
       if (cached) {
@@ -1038,7 +1225,7 @@ async function loadData(source) {
       }
     }
 
-    // Priority 3: URL param ?source=
+    // Priority 3: URL param
     if (!data) {
       var params = new URLSearchParams(window.location.search);
       var urlSource = params.get('source');
@@ -1050,7 +1237,7 @@ async function loadData(source) {
       }
     }
 
-    // Priority 4: default gbrain-data.json (the empty schema)
+    // Priority 4: default
     if (!data) {
       var res3 = await fetch('gbrain-data.json');
       if (!res3.ok) throw new Error('HTTP ' + res3.status);
@@ -1073,28 +1260,53 @@ function updateDataSource() {
   var badge = document.getElementById('dataSource');
   if (!badge) return;
   var pages = (DATA.pages || []).length;
-  var cached = localStorage.getItem('gbrain-custom-data');
-  var fromUrl = DATA._loadedFromURL;
-  if (pages === 0 && !cached) {
-    badge.textContent = '📄 empty';
-    badge.title = 'Upload your data via the ⚙️ menu';
-  } else if (fromUrl) {
-    badge.textContent = '🔗 remote';
-    badge.title = 'Loaded from: ' + fromUrl;
-  } else if (cached && DATA.pages && DATA.pages.length > 0) {
-    badge.textContent = '📤 ' + pages + ' pages';
-    badge.title = 'Custom data loaded in this browser';
+  if (MCP_CONNECTED && DATA._mcpSource) {
+    badge.textContent = '⚡ live MCP';
+    badge.title = 'Connected to gbrain MCP at ' + MCP_URL;
+    badge.style.color = 'var(--primary-light)';
   } else {
-    badge.textContent = '📄 ' + pages + ' pages';
-    badge.title = 'Loaded from gbrain-data.json';
+    badge.style.color = '';
+    var cached = localStorage.getItem('gbrain-custom-data');
+    var fromUrl = DATA._loadedFromURL;
+    if (pages === 0 && !cached) {
+      badge.textContent = '📄 empty';
+      badge.title = 'Upload data via ⚙️ or connect to gbrain MCP';
+    } else if (fromUrl) {
+      badge.textContent = '🔗 remote';
+      badge.title = 'Loaded from: ' + fromUrl;
+    } else if (cached && pages > 0) {
+      badge.textContent = '📤 ' + pages + ' pages';
+      badge.title = 'Custom data loaded in this browser';
+    } else {
+      badge.textContent = '📄 ' + pages + ' pages';
+      badge.title = 'Loaded from gbrain-data.json';
+    }
   }
 }
 
 function openLoadDataModal() {
   var html = '<div class="m-section">' +
-    '<div class="m-section-title">Load your brain data</div>' +
-    '<p style="font-size:0.75rem;color:var(--text-muted);margin:4px 0 16px">Upload a <code>gbrain-data.json</code> file or load from a URL. Your data stays in this browser — nothing is sent to any server.</p>' +
+    '<div class="m-section-title">Connect to gbrain MCP</div>' +
+    '<p style="font-size:0.75rem;color:var(--text-muted);margin:4px 0 12px">For gbrain users: connect directly to your running <code>gbrain serve --http</code> server. No JSON file needed — data loads live.</p>' +
+    '<div style="margin-bottom:10px">' +
+      '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">MCP URL</label>' +
+      '<input type="text" id="mcpUrl" placeholder="http://localhost:3131/mcp" value="' + (MCP_URL || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
+    '</div>' +
     '<div style="margin-bottom:14px">' +
+      '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">Bearer Token</label>' +
+      '<input type="password" id="mcpToken" placeholder="your-gbrain-access-token" value="' + (MCP_TOKEN || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
+    '</div>' +
+    '<div style="margin-bottom:14px;display:flex;gap:6px">' +
+      '<button onclick="connectToMCP()" style="flex:1;padding:8px 16px;background:var(--primary-light);border:none;border-radius:8px;color:#020617;font-size:0.75rem;font-weight:600;cursor:pointer">⚡ Connect to gbrain</button>' +
+      (MCP_CONNECTED ? '<button onclick="disconnectMCP()" style="padding:8px 16px;background:var(--rose);border:none;border-radius:8px;color:#fff;font-size:0.75rem;font-weight:600;cursor:pointer">Disconnect</button>' : '') +
+    '</div>' +
+    (MCP_CONNECTED ? '<div style="font-size:0.68rem;color:var(--green);margin-bottom:12px">✓ Connected to gbrain MCP — data loads live on refresh</div>' : '') +
+
+    '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">' +
+
+    '<div class="m-section-title" style="margin-top:0">Or load a JSON file</div>' +
+    '<p style="font-size:0.75rem;color:var(--text-muted);margin:4px 0 12px">If you don\'t run gbrain, upload a pre-built <code>gbrain-data.json</code> file.</p>' +
+    '<div style="margin-bottom:10px">' +
       '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">Upload file</label>' +
       '<input type="file" accept=".json" id="fileInput" onchange="handleFileUpload(event)" style="width:100%;padding:8px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;color:var(--text-muted);font-size:0.75rem;cursor:pointer">' +
     '</div>' +
@@ -1107,11 +1319,36 @@ function openLoadDataModal() {
     '</div>' +
     '<hr style="border:none;border-top:1px solid var(--border);margin:14px 0">' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button onclick="clearCustomData()" style="padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;cursor:pointer">Reset to default</button>' +
+      '<button onclick="clearAllData()" style="padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;cursor:pointer">Reset everything</button>' +
       '<button onclick="closeModal()" style="padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-muted);font-size:0.75rem;cursor:pointer">Close</button>' +
     '</div>' +
   '</div>';
-  openModal('⚙️ Data Source', 'Load your own gbrain data', html);
+  openModal('⚙️ Data Source', 'Connect to gbrain or load a JSON file', html);
+}
+
+function connectToMCP() {
+  var url = document.getElementById('mcpUrl').value.trim();
+  var token = document.getElementById('mcpToken').value.trim();
+  if (!url || !token) {
+    document.getElementById('errorMsg').textContent = 'Both MCP URL and token are required';
+    document.getElementById('error').style.display = 'block';
+    return;
+  }
+  closeModal();
+  MCP_URL = url;
+  MCP_TOKEN = token;
+  localStorage.setItem('gbrain-mcp-url', url);
+  localStorage.setItem('gbrain-mcp-token', token);
+  loadData();
+}
+
+function disconnectMCP() {
+  MCP_URL = null;
+  MCP_TOKEN = null;
+  MCP_CONNECTED = false;
+  localStorage.removeItem('gbrain-mcp-url');
+  localStorage.removeItem('gbrain-mcp-token');
+  loadData();
 }
 
 function handleFileUpload(event) {
@@ -1122,6 +1359,7 @@ function handleFileUpload(event) {
     try {
       var data = JSON.parse(e.target.result);
       closeModal();
+      MCP_CONNECTED = false; // File upload overrides MCP
       loadData(data);
     } catch(err) {
       document.getElementById('errorMsg').textContent = 'Invalid JSON: ' + err.message;
@@ -1136,14 +1374,31 @@ function loadFromUrl() {
   if (!url) return;
   DATA._loadedFromURL = url;
   closeModal();
+  MCP_CONNECTED = false;
   loadData(url);
 }
 
-function clearCustomData() {
+function clearAllData() {
   localStorage.removeItem('gbrain-custom-data');
+  localStorage.removeItem('gbrain-mcp-url');
+  localStorage.removeItem('gbrain-mcp-token');
+  MCP_URL = null;
+  MCP_TOKEN = null;
+  MCP_CONNECTED = false;
   closeModal();
   loadData();
 }
+
+// Restore MCP connection from localStorage on page load
+(function() {
+  var savedUrl = localStorage.getItem('gbrain-mcp-url');
+  var savedToken = localStorage.getItem('gbrain-mcp-token');
+  if (savedUrl && savedToken) {
+    MCP_URL = savedUrl;
+    MCP_TOKEN = savedToken;
+    // Don't connect yet — loadData() will handle it
+  }
+})();
 
 function renderAll() {
   renderStats();
@@ -2357,46 +2612,68 @@ function runMobileQuery() {
     });
 }
 
-// ─── Live Query (desktop) ───
+// ─── Live Query ───
 function runLiveQuery() {
-  const input = document.getElementById('lqInput');
-  const btn = document.getElementById('lqBtn');
-  const results = document.getElementById('lqResults');
-  const loading = document.getElementById('lqLoading');
-  const error = document.getElementById('lqError');
-  const empty = document.getElementById('lqEmpty');
-  const q = input.value.trim();
+  var input = document.getElementById('lqInput');
+  var btn = document.getElementById('lqBtn');
+  var results = document.getElementById('lqResults');
+  var loading = document.getElementById('lqLoading');
+  var error = document.getElementById('lqError');
+  var empty = document.getElementById('lqEmpty');
+  var q = input.value.trim();
   if (!q) return;
   btn.disabled = true;
   results.innerHTML = '';
   error.style.display = 'none';
   empty.style.display = 'none';
   loading.style.display = 'block';
-  const API_BASE = 'https://signals-sunglasses-earnings-clock.trycloudflare.com';
-  fetch(API_BASE + '/api/query?q=' + encodeURIComponent(q))
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(data => {
-      loading.style.display = 'none';
-      if (!data.results || data.results.length === 0) { empty.style.display = 'block'; return; }
-      let html = '';
-      data.results.forEach(r => {
-        let scoreClass = 'low';
-        if (r.score >= 0.7) scoreClass = 'high';
-        else if (r.score >= 0.5) scoreClass = 'med';
-        const scorePct = Math.round(r.score * 100);
-        html += `<div class="lq-card" onclick="openPageModal('${escAttr(r.slug)}')">
-          <div class="lq-header"><span class="lq-score ${scoreClass}">${scorePct}%</span>
-          <span class="lq-path">${esc(r.slug)}</span></div>
-          <div class="lq-snippet">${esc((r.snippet||'').trim()) || '<span style="opacity:0.4">(no preview)</span>'}</div></div>`;
-      });
-      results.innerHTML = html;
-    })
-    .catch(err => {
-      loading.style.display = 'none';
-      error.textContent = 'Connection failed — API server may be offline (' + err.message + ')';
-      error.style.display = 'block';
-    })
-    .finally(() => { btn.disabled = false; });
+
+  // Use MCP if connected
+  if (MCP_CONNECTED && MCP_URL) {
+    mcpCall('query', { q: q })
+      .then(function(data) {
+        loading.style.display = 'none';
+        var hits = data.results || data || [];
+        if (!hits.length) { empty.style.display = 'block'; return; }
+        var html = '';
+        hits.forEach(function(r) {
+          var scorePct = Math.round((r.score || 0.5) * 100);
+          var scoreClass = scorePct >= 70 ? 'high' : scorePct >= 50 ? 'med' : 'low';
+          html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(r.slug || '') + '\')">' +
+            '<div class="lq-header"><span class="lq-score ' + scoreClass + '">' + scorePct + '%</span>' +
+            '<span class="lq-path">' + esc(r.slug || '') + '</span></div>' +
+            '<div class="lq-snippet">' + esc((r.snippet || r.body || r.text || '').substring(0, 200)) + '</div></div>';
+        });
+        results.innerHTML = html;
+      })
+      .catch(function(err) {
+        loading.style.display = 'none';
+        error.textContent = 'Query failed — ' + err.message;
+        error.style.display = 'block';
+      })
+      .finally(function() { btn.disabled = false; });
+    return;
+  }
+
+  // Fallback: local page search
+  loading.style.display = 'none';
+  var ql = q.toLowerCase();
+  var matches = (DATA.pages || []).filter(function(p) {
+    return (p.title || '').toLowerCase().indexOf(ql) >= 0 ||
+           (p.body || '').toLowerCase().indexOf(ql) >= 0 ||
+           (p.slug || '').toLowerCase().indexOf(ql) >= 0;
+  }).slice(0, 20);
+  if (!matches.length) { empty.style.display = 'block'; btn.disabled = false; return; }
+  var html = '';
+  matches.forEach(function(p) {
+    var body = (p.body || '').substring(0, 200);
+    html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">' +
+      '<div class="lq-header"><span class="lq-score med">match</span>' +
+      '<span class="lq-path">' + esc(p.slug) + '</span></div>' +
+      '<div class="lq-snippet">' + esc(body || '(no content)') + '</div></div>';
+  });
+  results.innerHTML = html;
+  btn.disabled = false;
 }
 
 loadData();

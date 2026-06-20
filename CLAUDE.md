@@ -15,11 +15,25 @@ An interactive, themeable knowledge-base dashboard — a single self-contained H
 
 ## Quick start
 
+### Option A: Direct MCP connection (recommended)
+
+If you run gbrain with `gbrain serve --http`:
+
+1. Open `index.html` in a browser
+2. Click ⚙️ gear icon → enter your MCP URL (e.g. `http://localhost:3131/mcp`) and bearer token
+3. Click "Connect to gbrain" — data loads live from your brain
+
+### Option B: JSON file
+
 1. Clone the repo
-2. Open `index.html` in a browser (or serve with `python3 -m http.server 8080`)
-3. Click the ⚙️ gear icon and upload your own `gbrain-data.json`
+2. Host `index.html` and your `gbrain-data.json` on any static server
+3. Upload via the ⚙️ menu, load from URL, or add `?source=https://...` to the URL
 
 That's it. No build step, no dependencies, no server required.
+
+### Option C: Just open the empty dashboard
+
+It ships with an empty schema — 0 pages, ready for your data.
 
 ## Data schema (`gbrain-data.json`)
 
