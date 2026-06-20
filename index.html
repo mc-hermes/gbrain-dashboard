@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&amp;family=Syne:wght@600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
-<style>
+  <style>
   /* ═══════════════════════════════════════════════
      gbrain dashboard — Tokyo Night Design System
      ═══════════════════════════════════════════════ */
@@ -117,7 +117,8 @@
   body.library ::-webkit-scrollbar-track { background: var(--bg); }
   body.library ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   body.library ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
+  </style>
+  <style>
   /* ─── Base ─── */
   html { scroll-behavior: smooth; }
   body {
@@ -144,7 +145,8 @@
 
   /* ─── Grid ─── */
   .app { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
-
+  </style>
+  <style>
   /* ─── Header ─── */
   .header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
   .header-left h1 { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
@@ -223,7 +225,8 @@
     .log-detail { flex-basis: 100%; padding-top: 2px; }
   }
   .log-offline { color: var(--text-muted); font-style: italic; padding: 6px 0; }
-
+  </style>
+  <style>
   /* ─── Table ─── */
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
@@ -576,7 +579,8 @@
   .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.8rem; }
-
+  </style>
+  <style>
   /* ═══════ MOBILE ═══════ */
   @media (max-width: 768px) {
     .app { padding: 16px 12px 100px; }
@@ -833,8 +837,7 @@
   .art-preview-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; font-size: 0.65rem; color: var(--text-muted); }
   .art-preview-meta span { display: flex; align-items: center; gap: 4px; }
   .art-preview-unsupported { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-  .art-preview-unsupported .icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
-</style>
+  </style>
 </head>
 <body>
 <div class="app-shell">
@@ -1212,7 +1215,7 @@
   </div>
 </div>
 
-<script>
+  <script>
 let DATA = null;
 let activeTab = 'pages';
 let activeView = 'today';
@@ -1221,6 +1224,185 @@ let pagesRendered = false;
 let entitiesRendered = false;
 let healthRendered = false;
 let artifactsRendered = false;
+// ─── VIEW SWAPPING ───
+function showView(name) {
+  activeView = name;
+  // Hide all view panels
+  document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+  // Show requested
+  const target = document.getElementById('view-' + name);
+  if (target) target.classList.add('active');
+
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector('.mobile-nav-btn[data-view="' + name + '"]');
+  if (navBtn) navBtn.classList.add('active');
+
+  // Update desktop view tabs
+  document.querySelectorAll('#desktopViewTabs .tab').forEach(t => t.classList.remove('active'));
+  const dt = document.querySelector('#desktopViewTabs .tab[data-dview="' + name + '"]');
+  if (dt) dt.classList.add('active');
+
+  // Close more menu
+  document.getElementById('moreMenu').classList.remove('active');
+
+  // Lazy render
+  if (name === 'graph' && !graphRendered) { drawGraph(); graphRendered = true; }
+  if (name === 'logs') {
+    if (!logsRendered) { renderLogs(); logsRendered = true; }
+    startLogsPoll();
+  } else {
+    stopLogsPoll();
+  }
+  if (name === 'browse') {
+    if (!pagesRendered) { renderPages(); pagesRendered = true; }
+    if (!entitiesRendered) { renderEntities(); entitiesRendered = true; }
+    if (!healthRendered) { renderHealth(); healthRendered = true; }
+    if (!artifactsRendered) { renderArtifacts(); artifactsRendered = true; }
+    // Show correct sub-view
+    showBrowseTab(activeTab);
+  }
+
+  // Resize canvas if graph view opened
+  if (name === 'graph') setTimeout(resizeCanvas, 50);
+}
+// ─── STATS ───
+// Stat icon SVGs (replaces emoji)
+var statIconSvgs = {
+  pages: '<svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg>',
+  brain: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><path d="M5 8c0-2 1-3 3-3s3 1 3 3-1 3-3 3-3-1-3-3z" stroke="currentColor"/><path d="M7 6v2M9 7v1" stroke="currentColor"/></svg>',
+  links: '<svg viewBox="0 0 16 16"><path d="M6 3l7 5-7 5V3z" stroke="currentColor" fill="none"/><path d="M3 5v6" stroke="currentColor"/></svg>',
+  graph: '<svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg>',
+  embed: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="5" stroke="currentColor" fill="none" opacity="0.5"/><circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" opacity="0.3"/></svg>'
+};
+
+function renderStats() {
+  const s = DATA.summary || {};
+  const pages = DATA.pages || [];
+  // Render compact chips into statChips (Today view) + fallback statGrid if present
+  var chips = [
+    {svg: statIconSvgs.pages, value: s.page_count, label: 'Pages'},
+    {svg: statIconSvgs.brain, value: s.score || '—', label: 'Score' + (s.score_label || ''), click: 'showBrainScoreModal'},
+    {svg: statIconSvgs.links, value: s.total_links, label: 'Links'},
+    {svg: statIconSvgs.graph, value: (s.graph_coverage||'').match(/[\\d.]+%/) ? (s.graph_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Graph'},
+    {svg: statIconSvgs.embed, value: (s.embed_coverage||'').match(/[\\d.]+%/) ? (s.embed_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Embed'}
+  ];
+  var html = chips.map(function(c) {
+    return '<div class="stat-chip"' + (c.click ? ' onclick="' + c.click + '()"' : '') + '>' +
+      '<span class="sc-icon">' + c.svg + '</span>' +
+      '<span class="sc-value">' + esc(String(c.value)) + '</span>' +
+      '<span class="sc-label">' + esc(c.label) + '</span>' +
+    '</div>';
+  }).join('');
+  var chipsEl = document.getElementById('statChips');
+  if (chipsEl) chipsEl.innerHTML = html;
+  // Also render into statGrid if it exists (for desktop)
+  var gridEl = document.getElementById('statGrid');
+  if (gridEl) {
+    var gridHtml = [
+      {icon: statIconSvgs.pages, value: s.page_count, label: 'Total Pages', detail: (s.concept_count||0) + ' concepts, ' + (s.meeting_count||0) + ' meetings, ' + (s.person_count||0) + ' people', cls: '', click: 'showStatBreakdown'},
+      {icon: statIconSvgs.brain, value: s.score || '—', label: 'Brain Score /100', detail: s.score_breakdown || '', cls: '', click: 'showBrainScoreModal'},
+      {icon: statIconSvgs.links, value: s.total_links, label: 'Total Links', detail: sumLinks('outbound') + ' outbound, ' + sumLinks('inbound') + ' inbound', cls: '', click: null},
+      {icon: statIconSvgs.graph, value: (s.graph_coverage||'').match(/[\\d.]+%/) ? (s.graph_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Graph Coverage', detail: s.graph_coverage||'', cls: '', click: null},
+      {icon: statIconSvgs.embed, value: (s.embed_coverage||'').match(/[\\d.]+%/) ? (s.embed_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Embeddings', detail: s.embed_coverage||'', cls: '', click: null}
+    ].map(function(c) {
+      return '<div class="stat-card"' + (c.click ? ' onclick="' + c.click + '()"' : '') + '>' +
+        '<div class="icon">' + c.icon + '</div><div class="value">' + esc(String(c.value)) + '</div><div class="label">' + esc(c.label) + '</div><div class="detail">' + esc(c.detail||'') + '</div>' +
+        (c.click ? '<div class="hint">click for details →</div>' : '') +
+      '</div>';
+    }).join('');
+    gridEl.innerHTML = gridHtml;
+  }
+}
+
+function showBrainScoreModal() {
+  var s = DATA.summary || {};
+  var comps = s.score_components || {};
+  var breakdown = s.score_breakdown || '';
+  var html = '<div class="m-section"><div class="m-section-title">Brain Score Breakdown</div>';
+  html += '<div style="font-family:Syne,sans-serif;font-size:3rem;font-weight:800;text-align:center;margin:16px 0;color:var(--primary-light)">' + esc(s.score||'—') + '<span style="font-size:1rem;color:var(--text-muted)">/100</span></div>';
+  var keys = ['embed', 'links', 'timeline', 'orphans', 'dead-links'];
+  keys.forEach(function(k) {
+    var val = comps[k] || '—/—';
+    var parts = val.split('/');
+    var numer = parseInt(parts[0]) || 0;
+    var denom = parseInt(parts[1]) || 0;
+    var pct = denom > 0 ? Math.round(numer/denom*100) : 0;
+    var color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--primary)' : 'var(--rose)';
+    html += '<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px"><span>' + k + '</span><span style="font-family:JetBrains Mono,monospace">' + val + '</span></div>';
+    html += '<div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px"></div></div></div>';
+  });
+  if (breakdown) {
+    html += '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:12px;font-family:JetBrains Mono,monospace">' + esc(breakdown) + '</div>';
+  }
+  html += '</div>';
+  openModal('Brain Score', 'brain-score', html);
+}
+
+function sumLinks(dir) {
+  return (DATA.pages||[]).reduce((s,p) => s + (dir==='outbound'?p.outbound_count:p.inbound_count), 0);
+}
+
+function showStatBreakdown() {
+  const types = {};
+  (DATA.pages||[]).forEach(p => { types[p.type] = (types[p.type]||0)+1; });
+  let html = '<div class="m-section"><div class="m-section-title">Page Type Breakdown</div>';
+  html += '<table style="width:100%"><thead><tr><th>Type</th><th>Count</th><th>%</th></tr></thead><tbody>';
+  const total = DATA.pages.length;
+  Object.entries(types).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => {
+    html += `<tr><td><span class="type-tag ${t}">${t}</span></td><td>${c}</td><td>${((c/total)*100).toFixed(0)}%</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  openModal('Page Type Breakdown', 'stat-breakdown', html);
+}
+
+function switchToHealth() {
+  showView('browse');
+  showBrowseTab('health');
+  document.querySelectorAll('#browseTabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-btab="health"]').classList.add('active');
+}
+// ─── FILTERS ───
+function filterCurrent() {
+  const q = document.getElementById('searchInput').value;
+  if (activeTab === 'pages') { renderPages(q); }
+  if (activeTab === 'artifacts') { renderArtifacts(q); }
+  if (activeTab === 'entities') { renderEntities(q); }
+}
+
+  if (!confirm('Delete ' + _bulkSelected.length + ' pages? This cannot be undone.')) return;
+  _bulkSelected.forEach(function(slug) {
+    if (MCP_CONNECTED && MCP_URL) {
+      try { mcpCall('delete_page', { slug: slug }); } catch(e) {}
+    }
+    DATA.pages = (DATA.pages||[]).filter(function(p) { return p.slug !== slug; });
+  });
+  DATA.summary.page_count = DATA.pages.length;
+  clearBulkSelect();
+  reRenderAll();
+  showView('browse');
+  showBrowseTab('pages');
+}
+
+function reRenderAll() {
+  renderStats();
+  renderDigest();
+  renderFeed();
+  pagesRendered = false;
+  entitiesRendered = false;
+  healthRendered = false;
+  graphRendered = false;
+  artifactsRendered = false;
+  if (activeView === 'browse') {
+    if (activeTab === 'pages') { renderPages(); pagesRendered = true; }
+    if (activeTab === 'entities') { renderEntities(); entitiesRendered = true; }
+  }
+  if (activeView === 'today') { renderFeed(); }
+  if (activeView === 'graph') { initGraph(); drawGraph(); graphRendered = true; }
+}
+
+  </script>
+  <script>
 // ─── MCP CLIENT ─────────────────────────────────────────────────────────
 var MCP_URL = null;
 var MCP_TOKEN = null;
@@ -1420,6 +1602,51 @@ async function loadFromMCP() {
     _mcpSource: true
   };
 }
+// Auto-DCR: Register OAuth client and get access token
+async function autoDCR(baseUrl) {
+  // Step 1: Register client via DCR
+  var regResp = await fetch(baseUrl + '/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_name: 'gbrain-dashboard',
+      grant_types: ['client_credentials'],
+      redirect_uris: [window.location.origin + '/callback'],
+      scope: 'admin',
+      token_endpoint_auth_method: 'client_secret_post'
+    })
+  });
+  if (!regResp.ok) {
+    var errText = await regResp.text();
+    throw new Error('DCR register failed (HTTP ' + regResp.status + '): ' + errText.substring(0, 100));
+  }
+  var regData = await regResp.json();
+  if (!regData.client_id || !regData.client_secret) {
+    throw new Error('DCR response missing client credentials');
+  }
+  
+  // Step 2: Exchange for access token
+  var tokResp = await fetch(baseUrl + '/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials&client_id=' + encodeURIComponent(regData.client_id) +
+          '&client_secret=' + encodeURIComponent(regData.client_secret) +
+          '&scope=admin'
+  });
+  if (!tokResp.ok) {
+    var tokErr = await tokResp.text();
+    throw new Error('Token exchange failed (HTTP ' + tokResp.status + '): ' + tokErr.substring(0, 100));
+  }
+  var tokData = await tokResp.json();
+  if (!tokData.access_token) {
+    throw new Error('Token response missing access_token');
+  }
+  
+  return tokData.access_token;
+}
+
+  </script>
+  <script>
 
 async function loadData(source) {
   document.getElementById('loading').style.display = 'flex';
@@ -1619,49 +1846,6 @@ function connectToMCP() {
   });
 }
 
-// Auto-DCR: Register OAuth client and get access token
-async function autoDCR(baseUrl) {
-  // Step 1: Register client via DCR
-  var regResp = await fetch(baseUrl + '/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_name: 'gbrain-dashboard',
-      grant_types: ['client_credentials'],
-      redirect_uris: [window.location.origin + '/callback'],
-      scope: 'admin',
-      token_endpoint_auth_method: 'client_secret_post'
-    })
-  });
-  if (!regResp.ok) {
-    var errText = await regResp.text();
-    throw new Error('DCR register failed (HTTP ' + regResp.status + '): ' + errText.substring(0, 100));
-  }
-  var regData = await regResp.json();
-  if (!regData.client_id || !regData.client_secret) {
-    throw new Error('DCR response missing client credentials');
-  }
-  
-  // Step 2: Exchange for access token
-  var tokResp = await fetch(baseUrl + '/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'grant_type=client_credentials&client_id=' + encodeURIComponent(regData.client_id) +
-          '&client_secret=' + encodeURIComponent(regData.client_secret) +
-          '&scope=admin'
-  });
-  if (!tokResp.ok) {
-    var tokErr = await tokResp.text();
-    throw new Error('Token exchange failed (HTTP ' + tokResp.status + '): ' + tokErr.substring(0, 100));
-  }
-  var tokData = await tokResp.json();
-  if (!tokData.access_token) {
-    throw new Error('Token response missing access_token');
-  }
-  
-  return tokData.access_token;
-}
-
 function disconnectMCP() {
   MCP_URL = null;
   MCP_TOKEN = null;
@@ -1732,147 +1916,8 @@ function renderAll() {
     t.onclick = function(){ filterFeed(this.getAttribute('data-src')); };
   });
 }
-
-// ─── VIEW SWAPPING ───
-function showView(name) {
-  activeView = name;
-  // Hide all view panels
-  document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
-  // Show requested
-  const target = document.getElementById('view-' + name);
-  if (target) target.classList.add('active');
-
-  // Update mobile nav
-  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
-  const navBtn = document.querySelector('.mobile-nav-btn[data-view="' + name + '"]');
-  if (navBtn) navBtn.classList.add('active');
-
-  // Update desktop view tabs
-  document.querySelectorAll('#desktopViewTabs .tab').forEach(t => t.classList.remove('active'));
-  const dt = document.querySelector('#desktopViewTabs .tab[data-dview="' + name + '"]');
-  if (dt) dt.classList.add('active');
-
-  // Close more menu
-  document.getElementById('moreMenu').classList.remove('active');
-
-  // Lazy render
-  if (name === 'graph' && !graphRendered) { drawGraph(); graphRendered = true; }
-  if (name === 'logs') {
-    if (!logsRendered) { renderLogs(); logsRendered = true; }
-    startLogsPoll();
-  } else {
-    stopLogsPoll();
-  }
-  if (name === 'browse') {
-    if (!pagesRendered) { renderPages(); pagesRendered = true; }
-    if (!entitiesRendered) { renderEntities(); entitiesRendered = true; }
-    if (!healthRendered) { renderHealth(); healthRendered = true; }
-    if (!artifactsRendered) { renderArtifacts(); artifactsRendered = true; }
-    // Show correct sub-view
-    showBrowseTab(activeTab);
-  }
-
-  // Resize canvas if graph view opened
-  if (name === 'graph') setTimeout(resizeCanvas, 50);
-}
-
-// ─── STATS ───
-// Stat icon SVGs (replaces emoji)
-var statIconSvgs = {
-  pages: '<svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg>',
-  brain: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><path d="M5 8c0-2 1-3 3-3s3 1 3 3-1 3-3 3-3-1-3-3z" stroke="currentColor"/><path d="M7 6v2M9 7v1" stroke="currentColor"/></svg>',
-  links: '<svg viewBox="0 0 16 16"><path d="M6 3l7 5-7 5V3z" stroke="currentColor" fill="none"/><path d="M3 5v6" stroke="currentColor"/></svg>',
-  graph: '<svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg>',
-  embed: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="5" stroke="currentColor" fill="none" opacity="0.5"/><circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" opacity="0.3"/></svg>'
-};
-
-function renderStats() {
-  const s = DATA.summary || {};
-  const pages = DATA.pages || [];
-  // Render compact chips into statChips (Today view) + fallback statGrid if present
-  var chips = [
-    {svg: statIconSvgs.pages, value: s.page_count, label: 'Pages'},
-    {svg: statIconSvgs.brain, value: s.score || '—', label: 'Score' + (s.score_label || ''), click: 'showBrainScoreModal'},
-    {svg: statIconSvgs.links, value: s.total_links, label: 'Links'},
-    {svg: statIconSvgs.graph, value: (s.graph_coverage||'').match(/[\\d.]+%/) ? (s.graph_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Graph'},
-    {svg: statIconSvgs.embed, value: (s.embed_coverage||'').match(/[\\d.]+%/) ? (s.embed_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Embed'}
-  ];
-  var html = chips.map(function(c) {
-    return '<div class="stat-chip"' + (c.click ? ' onclick="' + c.click + '()"' : '') + '>' +
-      '<span class="sc-icon">' + c.svg + '</span>' +
-      '<span class="sc-value">' + esc(String(c.value)) + '</span>' +
-      '<span class="sc-label">' + esc(c.label) + '</span>' +
-    '</div>';
-  }).join('');
-  var chipsEl = document.getElementById('statChips');
-  if (chipsEl) chipsEl.innerHTML = html;
-  // Also render into statGrid if it exists (for desktop)
-  var gridEl = document.getElementById('statGrid');
-  if (gridEl) {
-    var gridHtml = [
-      {icon: statIconSvgs.pages, value: s.page_count, label: 'Total Pages', detail: (s.concept_count||0) + ' concepts, ' + (s.meeting_count||0) + ' meetings, ' + (s.person_count||0) + ' people', cls: '', click: 'showStatBreakdown'},
-      {icon: statIconSvgs.brain, value: s.score || '—', label: 'Brain Score /100', detail: s.score_breakdown || '', cls: '', click: 'showBrainScoreModal'},
-      {icon: statIconSvgs.links, value: s.total_links, label: 'Total Links', detail: sumLinks('outbound') + ' outbound, ' + sumLinks('inbound') + ' inbound', cls: '', click: null},
-      {icon: statIconSvgs.graph, value: (s.graph_coverage||'').match(/[\\d.]+%/) ? (s.graph_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Graph Coverage', detail: s.graph_coverage||'', cls: '', click: null},
-      {icon: statIconSvgs.embed, value: (s.embed_coverage||'').match(/[\\d.]+%/) ? (s.embed_coverage.match(/[\\d.]+%/)[0]) : '—', label: 'Embeddings', detail: s.embed_coverage||'', cls: '', click: null}
-    ].map(function(c) {
-      return '<div class="stat-card"' + (c.click ? ' onclick="' + c.click + '()"' : '') + '>' +
-        '<div class="icon">' + c.icon + '</div><div class="value">' + esc(String(c.value)) + '</div><div class="label">' + esc(c.label) + '</div><div class="detail">' + esc(c.detail||'') + '</div>' +
-        (c.click ? '<div class="hint">click for details →</div>' : '') +
-      '</div>';
-    }).join('');
-    gridEl.innerHTML = gridHtml;
-  }
-}
-
-function showBrainScoreModal() {
-  var s = DATA.summary || {};
-  var comps = s.score_components || {};
-  var breakdown = s.score_breakdown || '';
-  var html = '<div class="m-section"><div class="m-section-title">Brain Score Breakdown</div>';
-  html += '<div style="font-family:Syne,sans-serif;font-size:3rem;font-weight:800;text-align:center;margin:16px 0;color:var(--primary-light)">' + esc(s.score||'—') + '<span style="font-size:1rem;color:var(--text-muted)">/100</span></div>';
-  var keys = ['embed', 'links', 'timeline', 'orphans', 'dead-links'];
-  keys.forEach(function(k) {
-    var val = comps[k] || '—/—';
-    var parts = val.split('/');
-    var numer = parseInt(parts[0]) || 0;
-    var denom = parseInt(parts[1]) || 0;
-    var pct = denom > 0 ? Math.round(numer/denom*100) : 0;
-    var color = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--primary)' : 'var(--rose)';
-    html += '<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:2px"><span>' + k + '</span><span style="font-family:JetBrains Mono,monospace">' + val + '</span></div>';
-    html += '<div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:3px"></div></div></div>';
-  });
-  if (breakdown) {
-    html += '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:12px;font-family:JetBrains Mono,monospace">' + esc(breakdown) + '</div>';
-  }
-  html += '</div>';
-  openModal('Brain Score', 'brain-score', html);
-}
-
-function sumLinks(dir) {
-  return (DATA.pages||[]).reduce((s,p) => s + (dir==='outbound'?p.outbound_count:p.inbound_count), 0);
-}
-
-function showStatBreakdown() {
-  const types = {};
-  (DATA.pages||[]).forEach(p => { types[p.type] = (types[p.type]||0)+1; });
-  let html = '<div class="m-section"><div class="m-section-title">Page Type Breakdown</div>';
-  html += '<table style="width:100%"><thead><tr><th>Type</th><th>Count</th><th>%</th></tr></thead><tbody>';
-  const total = DATA.pages.length;
-  Object.entries(types).sort((a,b)=>b[1]-a[1]).forEach(([t,c]) => {
-    html += `<tr><td><span class="type-tag ${t}">${t}</span></td><td>${c}</td><td>${((c/total)*100).toFixed(0)}%</td></tr>`;
-  });
-  html += '</tbody></table></div>';
-  openModal('Page Type Breakdown', 'stat-breakdown', html);
-}
-
-function switchToHealth() {
-  showView('browse');
-  showBrowseTab('health');
-  document.querySelectorAll('#browseTabs .tab').forEach(t => t.classList.remove('active'));
-  document.querySelector('[data-btab="health"]').classList.add('active');
-}
-
+  </script>
+  <script>
 // ─── TODAY FEED ───
 let feedSourceFilter = 'all';
 
@@ -2050,6 +2095,8 @@ function renderDigest() {
   slot.innerHTML = html;
 }
 
+  </script>
+  <script>
 // ─── LINK GRAPH (lazy) ───
 let graphNodes = [], graphSlugIndex = {}, graphEdges = 0;
 let graphZoom = 1, graphPanX = 0, graphPanY = 0;
@@ -2419,38 +2466,8 @@ function togglePhysics() {
   else { if (graphAnimFrame) { cancelAnimationFrame(graphAnimFrame); graphAnimFrame = null; } }
 }
 
-// ─── THEME ───
-const THEME_CLASSES = ['dark', 'light', 'catppuccin-mocha', 'catppuccin-latte', 'tokyo-night', 'omarchy', 'library'];
-function applyTheme(name) {
-  document.body.classList.remove(...THEME_CLASSES);
-  if (name && name !== 'dark') document.body.classList.add(name);
-  localStorage.setItem('gbrain-theme', name);
-  document.getElementById('themeSelect').value = name;
-  setTimeout(drawGraphFrame, 50);
-}
-(function() { const saved = localStorage.getItem('gbrain-theme') || 'library'; applyTheme(saved); })();
-(function() { if (localStorage.getItem('gbrain-sidebar-pinned') === 'true') document.getElementById('sidebar').classList.add('pinned'); })();
-
-// ─── SETTINGS ───
-function toggleSidebarPin() {
-  document.getElementById('sidebar').classList.toggle('pinned');
-  localStorage.setItem('gbrain-sidebar-pinned', document.getElementById('sidebar').classList.contains('pinned'));
-}
-function toggleSettings() {
-  document.getElementById('settingsPopover').classList.toggle('active');
-}
-function toggleMoreMenu() {
-  document.getElementById('moreMenu').classList.toggle('active');
-}
-document.addEventListener('click', function(e) {
-  const pop = document.getElementById('settingsPopover');
-  if (pop.classList.contains('active') && !pop.contains(e.target) && !e.target.classList.contains('cog-btn'))
-    pop.classList.remove('active');
-  const mm = document.getElementById('moreMenu');
-  if (mm.classList.contains('active') && !mm.contains(e.target) && !e.target.closest('.mobile-nav-btn[data-view="more"]'))
-    mm.classList.remove('active');
-});
-
+  </script>
+  <script>
 // ─── PAGES TABLE (lazy) ───
 function renderPages(filter) {
   let pages = DATA.pages || [];
@@ -2701,6 +2718,8 @@ document.getElementById('browseTabs').addEventListener('click', function(e) {
   showBrowseTab(e.target.dataset.btab);
 });
 
+  </script>
+  <script>
 // ─── MODALS ───
 function openPageModal(slug) {
   const page = (DATA.pages||[]).find(p => p.slug === slug);
@@ -2854,6 +2873,8 @@ function navigateTo(slug) {
   if (page) { closeModal(); setTimeout(() => openPageModal(page.slug), 100); }
 }
 
+  </script>
+  <script>
 // ─── CRUD: EDIT MODE ───
 var _editSlug = null;
 var _editTags = [];
@@ -3116,66 +3137,6 @@ function addTagToPage(slug, tag) {
   setTimeout(function() { openPageModal(slug); }, 100);
 }
 
-// ─── LINKEDIN CRM: TIER & HEALTH ───
-function getTier(tags) {
-  if (!tags) return null;
-  for (var i = 0; i < tags.length; i++) {
-    var m = tags[i].match(/^tier-([1-4])$/i);
-    if (m) return parseInt(m[1]);
-  }
-  return null;
-}
-
-function getRelationshipHealth(page) {
-  if (!page || page.type !== 'person') return 'unknown';
-  // Check for last-contact in body
-  var body = page.body || '';
-  var lcMatch = body.match(/Last contact:?\s*(.+)/i);
-  if (!lcMatch) {
-    // Check tags for recency indicators
-    var tags = page.tags || [];
-    if (tags.indexOf('active') !== -1 || tags.indexOf('recent') !== -1) return 'hot';
-    if (tags.indexOf('dormant') !== -1 || tags.indexOf('cold') !== -1) return 'cold';
-    return 'unknown';
-  }
-  var lcStr = lcMatch[1].trim();
-  // Parse date-like parts
-  var dateMatch = lcStr.match(/(\w+ \d+,? \d{4})|(\d{4}-\d{2}-\d{2})|(\w+ \d{4})/);
-  if (!dateMatch) return 'warm';
-  try {
-    var d = new Date(dateMatch[0]);
-    if (isNaN(d.getTime())) return 'warm';
-    var days = Math.floor((Date.now() - d.getTime()) / 86400000);
-    if (days <= 7) return 'hot';
-    if (days <= 30) return 'warm';
-    return 'cold';
-  } catch(e) {
-    return 'warm';
-  }
-}
-
-function renderTierBadge(tags) {
-  var tier = getTier(tags);
-  if (!tier) return '';
-  return '<span class="tier-badge tier-' + tier + '"><span class="tier-dot"></span>T' + tier + '</span>';
-}
-
-function renderHealthIndicator(page) {
-  if (page.type !== 'person') return '';
-  var health = getRelationshipHealth(page);
-  var labels = {hot:'Active', warm:'Warm', cold:'Dormant', unknown:''};
-  var label = labels[health] || '';
-  return '<span class="health-indicator"><span class="hi-dot ' + health + '"></span>' + (label ? esc(label) : '') + '</span>';
-}
-
-// Extract last contact date from page body
-function getLastContactDate(page) {
-  if (!page || page.type !== 'person') return '';
-  var body = page.body || '';
-  var m = body.match(/Last contact:?\s*(.+)/i);
-  return m ? m[1].trim().replace(/\n.*/, '').substring(0, 20) : '';
-}
-
 // ─── BULK OPERATIONS ───
 var _bulkSelected = [];
 
@@ -3239,46 +3200,104 @@ function bulkAddTag() {
   showBrowseTab('pages');
 }
 
-function bulkDelete() {
-  if (!confirm('Delete ' + _bulkSelected.length + ' pages? This cannot be undone.')) return;
-  _bulkSelected.forEach(function(slug) {
-    if (MCP_CONNECTED && MCP_URL) {
-      try { mcpCall('delete_page', { slug: slug }); } catch(e) {}
-    }
-    DATA.pages = (DATA.pages||[]).filter(function(p) { return p.slug !== slug; });
-  });
-  DATA.summary.page_count = DATA.pages.length;
-  clearBulkSelect();
-  reRenderAll();
-  showView('browse');
-  showBrowseTab('pages');
-}
-
-function reRenderAll() {
-  renderStats();
-  renderDigest();
-  renderFeed();
-  pagesRendered = false;
-  entitiesRendered = false;
-  healthRendered = false;
-  graphRendered = false;
-  artifactsRendered = false;
-  if (activeView === 'browse') {
-    if (activeTab === 'pages') { renderPages(); pagesRendered = true; }
-    if (activeTab === 'entities') { renderEntities(); entitiesRendered = true; }
+  </script>
+  <script>
+// ─── LINKEDIN CRM: TIER & HEALTH ───
+function getTier(tags) {
+  if (!tags) return null;
+  for (var i = 0; i < tags.length; i++) {
+    var m = tags[i].match(/^tier-([1-4])$/i);
+    if (m) return parseInt(m[1]);
   }
-  if (activeView === 'today') { renderFeed(); }
-  if (activeView === 'graph') { initGraph(); drawGraph(); graphRendered = true; }
+  return null;
 }
 
-// ─── FILTERS ───
-function filterCurrent() {
-  const q = document.getElementById('searchInput').value;
-  if (activeTab === 'pages') { renderPages(q); }
-  if (activeTab === 'artifacts') { renderArtifacts(q); }
-  if (activeTab === 'entities') { renderEntities(q); }
+function getRelationshipHealth(page) {
+  if (!page || page.type !== 'person') return 'unknown';
+  // Check for last-contact in body
+  var body = page.body || '';
+  var lcMatch = body.match(/Last contact:?\s*(.+)/i);
+  if (!lcMatch) {
+    // Check tags for recency indicators
+    var tags = page.tags || [];
+    if (tags.indexOf('active') !== -1 || tags.indexOf('recent') !== -1) return 'hot';
+    if (tags.indexOf('dormant') !== -1 || tags.indexOf('cold') !== -1) return 'cold';
+    return 'unknown';
+  }
+  var lcStr = lcMatch[1].trim();
+  // Parse date-like parts
+  var dateMatch = lcStr.match(/(\w+ \d+,? \d{4})|(\d{4}-\d{2}-\d{2})|(\w+ \d{4})/);
+  if (!dateMatch) return 'warm';
+  try {
+    var d = new Date(dateMatch[0]);
+    if (isNaN(d.getTime())) return 'warm';
+    var days = Math.floor((Date.now() - d.getTime()) / 86400000);
+    if (days <= 7) return 'hot';
+    if (days <= 30) return 'warm';
+    return 'cold';
+  } catch(e) {
+    return 'warm';
+  }
 }
 
+function renderTierBadge(tags) {
+  var tier = getTier(tags);
+  if (!tier) return '';
+  return '<span class="tier-badge tier-' + tier + '"><span class="tier-dot"></span>T' + tier + '</span>';
+}
+
+function renderHealthIndicator(page) {
+  if (page.type !== 'person') return '';
+  var health = getRelationshipHealth(page);
+  var labels = {hot:'Active', warm:'Warm', cold:'Dormant', unknown:''};
+  var label = labels[health] || '';
+  return '<span class="health-indicator"><span class="hi-dot ' + health + '"></span>' + (label ? esc(label) : '') + '</span>';
+}
+
+// Extract last contact date from page body
+function getLastContactDate(page) {
+  if (!page || page.type !== 'person') return '';
+  var body = page.body || '';
+  var m = body.match(/Last contact:?\s*(.+)/i);
+  return m ? m[1].trim().replace(/\n.*/, '').substring(0, 20) : '';
+}
+
+  </script>
+  <script>
+// ─── THEME ───
+const THEME_CLASSES = ['dark', 'light', 'catppuccin-mocha', 'catppuccin-latte', 'tokyo-night', 'omarchy', 'library'];
+function applyTheme(name) {
+  document.body.classList.remove(...THEME_CLASSES);
+  if (name && name !== 'dark') document.body.classList.add(name);
+  localStorage.setItem('gbrain-theme', name);
+  document.getElementById('themeSelect').value = name;
+  setTimeout(drawGraphFrame, 50);
+}
+(function() { const saved = localStorage.getItem('gbrain-theme') || 'library'; applyTheme(saved); })();
+(function() { if (localStorage.getItem('gbrain-sidebar-pinned') === 'true') document.getElementById('sidebar').classList.add('pinned'); })();
+
+// ─── SETTINGS ───
+function toggleSidebarPin() {
+  document.getElementById('sidebar').classList.toggle('pinned');
+  localStorage.setItem('gbrain-sidebar-pinned', document.getElementById('sidebar').classList.contains('pinned'));
+}
+function toggleSettings() {
+  document.getElementById('settingsPopover').classList.toggle('active');
+}
+function toggleMoreMenu() {
+  document.getElementById('moreMenu').classList.toggle('active');
+}
+document.addEventListener('click', function(e) {
+  const pop = document.getElementById('settingsPopover');
+  if (pop.classList.contains('active') && !pop.contains(e.target) && !e.target.classList.contains('cog-btn'))
+    pop.classList.remove('active');
+  const mm = document.getElementById('moreMenu');
+  if (mm.classList.contains('active') && !mm.contains(e.target) && !e.target.closest('.mobile-nav-btn[data-view="more"]'))
+    mm.classList.remove('active');
+});
+
+  </script>
+  <script>
 // ─── DOCS ───
 const DOCS = {
   overview: `<h2>gbrain Dashboard</h2><p>A live control panel for your AI-powered knowledge base. This dashboard shows everything your company knows — people, companies, meetings, concepts, infrastructure — and how it all connects.</p><h3>What You're Looking At</h3><ul><li><strong>Stats bar</strong> — page count, brain health score, link coverage, embedding status</li><li><strong>Knowledge Graph</strong> — a visual map of how your ideas, people, and companies connect</li><li><strong>Page Browser</strong> — every page in your brain, searchable and clickable</li><li><strong>Entity Cards</strong> — people and companies with contact details</li><li><strong>Health Panel</strong> — 50+ automated checks monitoring your brain's status</li></ul><div class="callout"><strong>New?</strong> Start by clicking any page name, then follow the links. It's Wikipedia-style browsing for your own company knowledge.</div>`,
@@ -3344,6 +3363,8 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+  </script>
+  <script>
 // ─── MOBILE ASK ───
 function runMobileQuery() {
   const input = document.getElementById('mqInput');
@@ -3390,72 +3411,6 @@ function runMobileQuery() {
       error.style.display = 'block';
     });
 }
-
-// ─── Live Query ───
-function runLiveQuery() {
-  var input = document.getElementById('lqInput');
-  var btn = document.getElementById('lqBtn');
-  var results = document.getElementById('lqResults');
-  var loading = document.getElementById('lqLoading');
-  var error = document.getElementById('lqError');
-  var empty = document.getElementById('lqEmpty');
-  var q = input.value.trim();
-  if (!q) return;
-  btn.disabled = true;
-  results.innerHTML = '';
-  error.style.display = 'none';
-  empty.style.display = 'none';
-  loading.style.display = 'block';
-
-  // Use MCP if connected
-  if (MCP_CONNECTED && MCP_URL) {
-    mcpCall('query', { q: q })
-      .then(function(data) {
-        loading.style.display = 'none';
-        var hits = data.results || data || [];
-        if (!hits.length) { empty.style.display = 'block'; return; }
-        var html = '';
-        hits.forEach(function(r) {
-          var scorePct = Math.round((r.score || 0.5) * 100);
-          var scoreClass = scorePct >= 70 ? 'high' : scorePct >= 50 ? 'med' : 'low';
-          html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(r.slug || '') + '\')">' +
-            '<div class="lq-header"><span class="lq-score ' + scoreClass + '">' + scorePct + '%</span>' +
-            '<span class="lq-path">' + esc(r.slug || '') + '</span></div>' +
-            '<div class="lq-snippet">' + esc((r.snippet || r.body || r.text || '').substring(0, 200)) + '</div></div>';
-        });
-        results.innerHTML = html;
-      })
-      .catch(function(err) {
-        loading.style.display = 'none';
-        error.textContent = 'Query failed — ' + err.message;
-        error.style.display = 'block';
-      })
-      .finally(function() { btn.disabled = false; });
-    return;
-  }
-
-  // Fallback: local page search
-  loading.style.display = 'none';
-  var ql = q.toLowerCase();
-  var matches = (DATA.pages || []).filter(function(p) {
-    return (p.title || '').toLowerCase().indexOf(ql) >= 0 ||
-           (p.body || '').toLowerCase().indexOf(ql) >= 0 ||
-           (p.slug || '').toLowerCase().indexOf(ql) >= 0;
-  }).slice(0, 20);
-  if (!matches.length) { empty.style.display = 'block'; btn.disabled = false; return; }
-  var html = '';
-  matches.forEach(function(p) {
-    var body = (p.body || '').substring(0, 200);
-    html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">' +
-      '<div class="lq-header"><span class="lq-score med">match</span>' +
-      '<span class="lq-path">' + esc(p.slug) + '</span></div>' +
-      '<div class="lq-snippet">' + esc(body || '(no content)') + '</div></div>';
-  });
-  results.innerHTML = html;
-  btn.disabled = false;
-}
-
-loadData();
 
 // ─── Scroll-aware chat bubble hide (mobile) ───
 (function() {
@@ -3586,6 +3541,76 @@ function sendChat() {
     .finally(function() { btn.disabled = false; });
 }
 
+  </script>
+  <script>
+// ─── Live Query ───
+function runLiveQuery() {
+  var input = document.getElementById('lqInput');
+  var btn = document.getElementById('lqBtn');
+  var results = document.getElementById('lqResults');
+  var loading = document.getElementById('lqLoading');
+  var error = document.getElementById('lqError');
+  var empty = document.getElementById('lqEmpty');
+  var q = input.value.trim();
+  if (!q) return;
+  btn.disabled = true;
+  results.innerHTML = '';
+  error.style.display = 'none';
+  empty.style.display = 'none';
+  loading.style.display = 'block';
+
+  // Use MCP if connected
+  if (MCP_CONNECTED && MCP_URL) {
+    mcpCall('query', { q: q })
+      .then(function(data) {
+        loading.style.display = 'none';
+        var hits = data.results || data || [];
+        if (!hits.length) { empty.style.display = 'block'; return; }
+        var html = '';
+        hits.forEach(function(r) {
+          var scorePct = Math.round((r.score || 0.5) * 100);
+          var scoreClass = scorePct >= 70 ? 'high' : scorePct >= 50 ? 'med' : 'low';
+          html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(r.slug || '') + '\')">' +
+            '<div class="lq-header"><span class="lq-score ' + scoreClass + '">' + scorePct + '%</span>' +
+            '<span class="lq-path">' + esc(r.slug || '') + '</span></div>' +
+            '<div class="lq-snippet">' + esc((r.snippet || r.body || r.text || '').substring(0, 200)) + '</div></div>';
+        });
+        results.innerHTML = html;
+      })
+      .catch(function(err) {
+        loading.style.display = 'none';
+        error.textContent = 'Query failed — ' + err.message;
+        error.style.display = 'block';
+      })
+      .finally(function() { btn.disabled = false; });
+    return;
+  }
+
+  // Fallback: local page search
+  loading.style.display = 'none';
+  var ql = q.toLowerCase();
+  var matches = (DATA.pages || []).filter(function(p) {
+    return (p.title || '').toLowerCase().indexOf(ql) >= 0 ||
+           (p.body || '').toLowerCase().indexOf(ql) >= 0 ||
+           (p.slug || '').toLowerCase().indexOf(ql) >= 0;
+  }).slice(0, 20);
+  if (!matches.length) { empty.style.display = 'block'; btn.disabled = false; return; }
+  var html = '';
+  matches.forEach(function(p) {
+    var body = (p.body || '').substring(0, 200);
+    html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">' +
+      '<div class="lq-header"><span class="lq-score med">match</span>' +
+      '<span class="lq-path">' + esc(p.slug) + '</span></div>' +
+      '<div class="lq-snippet">' + esc(body || '(no content)') + '</div></div>';
+  });
+  results.innerHTML = html;
+  btn.disabled = false;
+}
+
+loadData();
+
+  </script>
+  <script>
 // ═══════════════════════════════════════════════
 // Write — Note Composer
 // ═══════════════════════════════════════════════
@@ -3964,6 +3989,8 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+  </script>
+  <script>
 // ─── LOGS VIEW (live workflow activity) ───
 var _logEvents = [];
 var _logFilter = 'all';
@@ -4073,7 +4100,7 @@ function stopLogsPoll() {
   }
 }
 
-</script>
+  </script>
 </main>
 </div>
 </body>
