@@ -1407,11 +1407,11 @@ function openLoadDataModal() {
     '<p style="font-size:0.75rem;color:var(--text-muted);margin:4px 0 12px">For gbrain users: connect directly to your running <code>gbrain serve --http</code> server. No JSON file needed — data loads live.</p>' +
     '<div style="margin-bottom:10px">' +
       '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">MCP URL</label>' +
-      '<input type="text" id="mcpUrl" placeholder="http://localhost:3131/mcp" value="' + (MCP_URL || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
+      '<input type="text" id="mcpUrl" placeholder="http://localhost:8787" value="' + (MCP_URL || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
     '</div>' +
     '<div style="margin-bottom:14px">' +
-      '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">Bearer Token</label>' +
-      '<input type="password" id="mcpToken" placeholder="your-gbrain-access-token" value="' + (MCP_TOKEN || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
+      '<label style="font-size:0.7rem;font-weight:600;display:block;margin-bottom:6px">Token (optional for auto-DCR)</label>' +
+      '<input type="password" id="mcpToken" placeholder="leave empty for auto-DCR" value="' + (MCP_TOKEN || '') + '" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.75rem;font-family:JetBrains Mono,monospace">' +
     '</div>' +
     '<div style="margin-bottom:14px;display:flex;gap:6px">' +
       '<button onclick="connectToMCP()" style="flex:1;padding:8px 16px;background:var(--primary-light);border:none;border-radius:8px;color:#020617;font-size:0.75rem;font-weight:600;cursor:pointer">⚡ Connect to gbrain</button>' +
@@ -1446,17 +1446,84 @@ function openLoadDataModal() {
 function connectToMCP() {
   var url = document.getElementById('mcpUrl').value.trim();
   var token = document.getElementById('mcpToken').value.trim();
-  if (!url || !token) {
-    document.getElementById('errorMsg').textContent = 'Both MCP URL and token are required';
+  if (!url) {
+    document.getElementById('errorMsg').textContent = 'MCP URL is required';
     document.getElementById('error').style.display = 'block';
     return;
   }
+  // Normalize URL: strip /mcp suffix, store base URL
+  var baseUrl = url.replace(/\/mcp\/?$/, '').replace(/\/$/, '');
+  var mcpUrl = baseUrl + '/mcp';
+  
   closeModal();
-  MCP_URL = url;
-  MCP_TOKEN = token;
-  localStorage.setItem('gbrain-mcp-url', url);
-  localStorage.setItem('gbrain-mcp-token', token);
-  loadData();
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('error').style.display = 'none';
+  
+  // If user provided a token, try it directly first
+  if (token) {
+    MCP_URL = mcpUrl;
+    MCP_TOKEN = token;
+    localStorage.setItem('gbrain-mcp-url', mcpUrl);
+    localStorage.setItem('gbrain-mcp-token', token);
+    loadData();
+    return;
+  }
+  
+  // No token provided — try auto-DCR
+  autoDCR(baseUrl).then(function(accessToken) {
+    MCP_URL = mcpUrl;
+    MCP_TOKEN = accessToken;
+    localStorage.setItem('gbrain-mcp-url', mcpUrl);
+    localStorage.setItem('gbrain-mcp-token', accessToken);
+    loadData();
+  }).catch(function(err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('errorMsg').textContent = 'Auto-connect failed: ' + err.message + '. Enter a token manually or ensure gbrain serve has --enable-dcr.';
+    document.getElementById('error').style.display = 'block';
+  });
+}
+
+// Auto-DCR: Register OAuth client and get access token
+async function autoDCR(baseUrl) {
+  // Step 1: Register client via DCR
+  var regResp = await fetch(baseUrl + '/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_name: 'gbrain-dashboard',
+      grant_types: ['client_credentials'],
+      redirect_uris: [window.location.origin + '/callback'],
+      scope: 'admin',
+      token_endpoint_auth_method: 'client_secret_post'
+    })
+  });
+  if (!regResp.ok) {
+    var errText = await regResp.text();
+    throw new Error('DCR register failed (HTTP ' + regResp.status + '): ' + errText.substring(0, 100));
+  }
+  var regData = await regResp.json();
+  if (!regData.client_id || !regData.client_secret) {
+    throw new Error('DCR response missing client credentials');
+  }
+  
+  // Step 2: Exchange for access token
+  var tokResp = await fetch(baseUrl + '/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials&client_id=' + encodeURIComponent(regData.client_id) +
+          '&client_secret=' + encodeURIComponent(regData.client_secret) +
+          '&scope=admin'
+  });
+  if (!tokResp.ok) {
+    var tokErr = await tokResp.text();
+    throw new Error('Token exchange failed (HTTP ' + tokResp.status + '): ' + tokErr.substring(0, 100));
+  }
+  var tokData = await tokResp.json();
+  if (!tokData.access_token) {
+    throw new Error('Token response missing access_token');
+  }
+  
+  return tokData.access_token;
 }
 
 function disconnectMCP() {
