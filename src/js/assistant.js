@@ -1,76 +1,182 @@
-// ─── Unified Assistant v2 ─────────────────────────────────────────────────
-// Replaces chat.js + live-query.js. Single assistant on Today view.
-// Always uses /api/assistant for synthesized answers.
+// ─── Unified Assistant v3 — Session History ───────────────────────────────
+// localStorage-backed session history. Two-panel layout: sidebar + chat.
 
-let conversationHistory = [];
-const MAX_HISTORY = 6;
+const SESSIONS_KEY = 'gbrain-sessions';
+const MAX_SESSIONS = 50;
+let activeSessionId = null;
 let assistantReady = false;
 
-function initAssistant() {
-  if (assistantReady) return;
-  assistantReady = true;
+// ─── Session storage ──────────────────────────────────────────────────────
 
-  // Wire up the input
-  const input = document.getElementById('lqInput');
-  if (!input) return;
-  input.placeholder = 'Ask anything — e.g. "what should I know before meeting Zaim?"';
-  input.onkeydown = function(e) { if (e.key === 'Enter') sendAssistantQuery(); };
+function loadSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
 
-  const btn = document.getElementById('lqBtn');
-  if (btn) { btn.textContent = 'Ask'; btn.onclick = sendAssistantQuery; }
+function saveSessions(sessions) {
+  if (sessions.length > MAX_SESSIONS) sessions = sessions.slice(-MAX_SESSIONS);
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); }
+  catch(e) { /* quota exceeded — drop oldest */ }
+}
 
-  // Hide old search result displays, show chat
-  var lqResults = document.getElementById('lqResults');
-  var lqLoading = document.getElementById('lqLoading');
-  var lqError = document.getElementById('lqError');
-  var lqEmpty = document.getElementById('lqEmpty');
+function getActiveSession() {
+  if (!activeSessionId) return null;
+  var sessions = loadSessions();
+  for (var i = 0; i < sessions.length; i++) {
+    if (sessions[i].id === activeSessionId) return sessions[i];
+  }
+  return null;
+}
 
-  // Create chat messages container if not exists
-  if (!document.getElementById('assistantMessages')) {
-    var msgs = document.createElement('div');
-    msgs.id = 'assistantMessages';
-    msgs.className = 'assistant-messages';
-    msgs.innerHTML = '<div class="assistant-welcome" id="assistantWelcome">' +
-      '👋 <strong>Ask me anything</strong> about your knowledge base.<br><br>' +
-      '<div class="starter-grid">' +
-        '<button class="starter-pill" onclick="askStarter(\'what should i know before my next meeting?\')">Prep for meetings</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'what are my open action items?\')">Action items</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'what happened in my last meeting with Zaim?\')">Last meeting with Zaim</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'show me all people\')">People directory</button>' +
-      '</div>' +
-    '</div>';
+function createSession(firstQuestion) {
+  var id = 'sess-' + Date.now();
+  var session = {
+    id: id,
+    started: new Date().toISOString(),
+    title: firstQuestion.substring(0, 80),
+    messages: []
+  };
+  var sessions = loadSessions();
+  sessions.push(session);
+  if (sessions.length > MAX_SESSIONS) sessions = sessions.slice(-MAX_SESSIONS);
+  saveSessions(sessions);
+  return session;
+}
 
-    // Insert after the live-query-bar
-    var bar = document.querySelector('.live-query-bar');
-    if (bar && bar.parentNode) {
-      bar.parentNode.insertBefore(msgs, bar.nextSibling);
+function saveMessageToSession(role, text, extra) {
+  var sessions = loadSessions();
+  for (var i = 0; i < sessions.length; i++) {
+    if (sessions[i].id === activeSessionId) {
+      var msg = { role: role, text: text, time: new Date().toISOString() };
+      if (extra) {
+        if (extra.sources) msg.sources = extra.sources;
+        if (extra.followups) msg.followups = extra.followups;
+        if (extra.refined) msg.refined = extra.refined;
+      }
+      sessions[i].messages.push(msg);
+      // Update title from first user message if not set
+      if (!sessions[i].title && role === 'user') {
+        sessions[i].title = text.substring(0, 80);
+      }
+      saveSessions(sessions);
+      return;
     }
   }
-
-  // Repurpose loading/error/empty for assistant
-  if (lqLoading) lqLoading.id = 'assistantLoading';
-  if (lqError) lqError.id = 'assistantError';
-  if (lqEmpty) lqEmpty.id = 'assistantEmpty';
-  if (lqResults) { lqResults.style.display = 'none'; lqResults.id = 'assistantResults'; }
-
-  // Hide old mobile query elements
-  var mqInput = document.getElementById('mqInput');
-  var mqThread = document.getElementById('mqThread');
-  if (mqInput) mqInput.style.display = 'none';
-  if (mqThread) mqThread.style.display = 'none';
 }
 
-// Called after data loads
-if (typeof DATA !== 'undefined' || typeof MCP_CONNECTED !== 'undefined') {
-  initAssistant();
-} else {
-  // Wait for data
-  var _origLoadData = loadData;
-  loadData = function() {
-    _origLoadData.apply(this, arguments);
-    setTimeout(initAssistant, 500);
-  };
+function deleteSession(id) {
+  var sessions = loadSessions().filter(function(s) { return s.id !== id; });
+  saveSessions(sessions);
+  if (activeSessionId === id) {
+    activeSessionId = null;
+    renderChatWelcome();
+  }
+  renderSessionList();
 }
+
+// ─── UI: Session list sidebar ──────────────────────────────────────────────
+
+function renderSessionList() {
+  var list = document.getElementById('sessionList');
+  if (!list) return;
+  var sessions = loadSessions();
+  // Newest first
+  sessions.reverse();
+
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="session-empty">No past conversations.<br><br>Ask a question to start.</div>';
+    return;
+  }
+
+  var html = '';
+  sessions.forEach(function(s) {
+    var isActive = s.id === activeSessionId;
+    var msgCount = s.messages.length;
+    var time = formatSessionTime(s.started);
+    var title = s.title || 'Untitled';
+    html += '<div class="session-item' + (isActive ? ' active' : '') + '" onclick="loadSession(\'' + escAttr(s.id) + '\')">' +
+      '<div class="session-item-title">' + esc(title) + '</div>' +
+      '<div class="session-item-meta"><span>' + time + '</span><span>' + msgCount + ' msg' + (msgCount !== 1 ? 's' : '') + '</span></div>' +
+      '<button class="session-item-del" onclick="event.stopPropagation();deleteSession(\'' + escAttr(s.id) + '\')" title="Delete">×</button>' +
+    '</div>';
+  });
+
+  // Restore original order for storage
+  sessions.reverse();
+  list.innerHTML = html;
+}
+
+function formatSessionTime(iso) {
+  try {
+    var d = new Date(iso);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago';
+    return d.toLocaleDateString();
+  } catch(e) { return ''; }
+}
+
+// ─── Load / New session ────────────────────────────────────────────────────
+
+function loadSession(id) {
+  activeSessionId = id;
+  var session = getActiveSession();
+  if (!session) { activeSessionId = null; renderChatWelcome(); return; }
+  renderSessionList();
+  renderSessionMessages(session);
+  // On mobile, close sidebar
+  if (window.innerWidth < 768) toggleSessionSidebar(false);
+}
+
+function newSession() {
+  activeSessionId = null;
+  renderSessionList();
+  renderChatWelcome();
+  var input = document.getElementById('lqInput');
+  if (input) { input.value = ''; input.focus(); }
+}
+
+function renderChatWelcome() {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+  msgs.innerHTML = '<div class="assistant-welcome" id="assistantWelcome">' +
+    '👋 <strong>Ask me anything</strong> about your knowledge base.<br><br>' +
+    '<div class="starter-grid">' +
+      '<button class="starter-pill" onclick="askStarter(\'what should i know before my next meeting?\')">Prep for meetings</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'what are my open action items?\')">Action items</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'what happened in my last meeting with Zaim?\')">Last meeting with Zaim</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'show me all people\')">People directory</button>' +
+    '</div>' +
+  '</div>';
+  document.getElementById('assistantInputWrap').style.display = '';
+}
+
+function renderSessionMessages(session) {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+  msgs.innerHTML = '';
+  document.getElementById('assistantWelcome') && (document.getElementById('assistantWelcome').style.display = 'none');
+  document.getElementById('assistantInputWrap').style.display = '';
+
+  session.messages.forEach(function(m) {
+    if (m.role === 'user') {
+      addAssistantBubble(esc(m.text), 'user', m.time);
+    } else {
+      addAssistantResponse({
+        response: m.text,
+        sources: m.sources || [],
+        followups: m.followups || [],
+        refined: m.refined || false
+      }, m.time);
+    }
+  });
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── Chat interface ────────────────────────────────────────────────────────
 
 function sendAssistantQuery() {
   var input = document.getElementById('lqInput');
@@ -83,14 +189,20 @@ function sendAssistantQuery() {
   var welcome = document.getElementById('assistantWelcome');
   if (welcome) welcome.style.display = 'none';
 
-  var msgs = document.getElementById('assistantMessages');
   var loading = document.getElementById('assistantLoading');
   var error = document.getElementById('assistantError');
+  var msgs = document.getElementById('assistantMessages');
+
+  // Create session if needed
+  if (!activeSessionId) {
+    var session = createSession(q);
+    activeSessionId = session.id;
+    renderSessionList();
+  }
 
   // Add user message
   addAssistantBubble(esc(q), 'user');
-  conversationHistory.push({ role: 'user', text: q });
-  if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+  saveMessageToSession('user', q);
 
   // Show thinking
   if (loading) loading.style.display = 'block';
@@ -104,60 +216,58 @@ function sendAssistantQuery() {
     .then(function(data) {
       if (loading) loading.style.display = 'none';
       addAssistantResponse(data);
-      conversationHistory.push({ role: 'assistant', text: (data.response || '').substring(0, 200) });
-      if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+      saveMessageToSession('assistant', data.response || '', {
+        sources: data.sources,
+        followups: data.followups,
+        refined: data.refined
+      });
+      // Update session list title if this was first question
+      renderSessionList();
+      msgs.scrollTop = msgs.scrollHeight;
     })
     .catch(function(err) {
       if (loading) loading.style.display = 'none';
       if (error) { error.textContent = 'Failed to reach the assistant — ' + err.message; error.style.display = 'block'; }
-
-      // Still show the error in chat
-      var d = document.createElement('div');
-      d.className = 'assistant-msg assistant';
-      d.innerHTML = '<div class="assistant-body"><div class="assistant-text">Sorry, I couldn\'t reach the knowledge base. Is the API server running?</div></div>';
-      if (msgs) msgs.appendChild(d);
+      addAssistantBubble('Sorry, I couldn\'t reach the knowledge base. Is the API server running?', 'assistant');
+      saveMessageToSession('assistant', 'Error: ' + err.message);
     })
     .finally(function() { if (btn) btn.disabled = false; });
 }
 
-function addAssistantBubble(html, role) {
+function addAssistantBubble(text, role, time) {
   var msgs = document.getElementById('assistantMessages');
   if (!msgs) return;
   var d = document.createElement('div');
   d.className = 'assistant-msg ' + role;
-  d.innerHTML = '<div class="assistant-body"><div class="assistant-text">' + html + '</div></div>';
+  var inner = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(text) + '</div>';
+  if (time) inner += '<div class="assistant-time">' + formatSessionTime(time) + '</div>';
+  inner += '</div>';
+  d.innerHTML = inner;
   msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function formatAssistantText(text) {
-  var html = esc(text);
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/(?:^|\n)> (.+)/g, '<blockquote>$1</blockquote>');
-  html = html.replace(/\n\n/g, '<br><br>');
-  html = html.replace(/\n/g, '<br>');
-  return html.replace(/^(<br>)+/, '');
-}
-
-function addAssistantResponse(data) {
+function addAssistantResponse(data, time) {
   var msgs = document.getElementById('assistantMessages');
   if (!msgs) return;
 
   var d = document.createElement('div');
   d.className = 'assistant-msg assistant';
+  var html = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(data.response || 'No response') + '</div>';
 
-  // Response text
-  var html = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(data.response || 'No response') + '</div></div>';
+  // Time stamp
+  if (time) html += '<div class="assistant-time">' + formatSessionTime(time) + '</div>';
 
   // Refined badge
   if (data.refined) {
-    html += '<div class="assistant-refined">✨ Synthesized with AI</div>';
+    html += '<div class="assistant-refined">✨ Synthesized</div>';
   }
+
+  html += '</div>';
 
   // Sources
   if (data.sources && data.sources.length > 0) {
-    var srcCount = data.sources.length;
-    html += '<button class="assistant-sources-toggle" onclick="toggleAssistantSources(this)">' + srcCount + ' source' + (srcCount !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
+    html += '<button class="assistant-sources-toggle" onclick="toggleAssistantSources(this)">' + data.sources.length + ' source' + (data.sources.length !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
     html += '<div class="assistant-sources">';
     data.sources.forEach(function(s) {
       var name = s.slug.split('/').pop().replace(/-/g, ' ').replace(/_/g, ' ');
@@ -180,6 +290,37 @@ function addAssistantResponse(data) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
+// ─── Sidebar toggle ────────────────────────────────────────────────────────
+
+function toggleSessionSidebar(force) {
+  var sidebar = document.getElementById('sessionSidebar');
+  var overlay = document.getElementById('sessionOverlay');
+  if (!sidebar) return;
+  var isOpen = sidebar.classList.contains('open');
+  var shouldOpen = force !== undefined ? force : !isOpen;
+
+  if (shouldOpen) {
+    sidebar.classList.add('open');
+    if (overlay) overlay.style.display = 'block';
+    renderSessionList();
+  } else {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.style.display = 'none';
+  }
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+
+function formatAssistantText(text) {
+  if (!text) return '';
+  var html = esc(text);
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(?:^|\n)> (.+)/g, '<blockquote>$1</blockquote>');
+  html = html.replace(/\n\n/g, '<br><br>');
+  html = html.replace(/\n/g, '<br>');
+  return html.replace(/^(<br>)+/, '');
+}
+
 function toggleAssistantSources(btn) {
   btn.classList.toggle('open');
   btn.nextElementSibling.classList.toggle('open');
@@ -195,15 +336,58 @@ function askFollowup(q) {
   if (input) { input.value = q; sendAssistantQuery(); }
 }
 
-function clearAssistantChat() {
-  var msgs = document.getElementById('assistantMessages');
-  var welcome = document.getElementById('assistantWelcome');
-  if (msgs) msgs.innerHTML = '';
-  if (welcome) { msgs.appendChild(welcome); welcome.style.display = ''; }
-  conversationHistory = [];
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+function initAssistant() {
+  if (assistantReady) return;
+  assistantReady = true;
+
+  var input = document.getElementById('lqInput');
+  if (!input) return;
+  input.placeholder = 'Ask anything — e.g. "what should I know before meeting Zaim?"';
+  input.onkeydown = function(e) { if (e.key === 'Enter') sendAssistantQuery(); };
+
+  var btn = document.getElementById('lqBtn');
+  if (btn) { btn.textContent = 'Ask'; btn.onclick = sendAssistantQuery; }
+
+  // Hide old elements
+  var lqResults = document.getElementById('lqResults');
+  var lqLoading = document.getElementById('lqLoading');
+  var lqError = document.getElementById('lqError');
+  if (lqResults) lqResults.style.display = 'none';
+  if (lqLoading) { lqLoading.id = 'assistantLoading'; lqLoading.style.display = 'none'; }
+  if (lqError) { lqError.id = 'assistantError'; lqError.style.display = 'none'; }
+
+  renderSessionList();
+  renderChatWelcome();
 }
 
-// ─── Escaping helpers (shared) ───
+// Wire up after data loads
+(function() {
+  var orig = loadData;
+  loadData = function() {
+    var ret = orig.apply(this, arguments);
+    setTimeout(function() {
+      if (typeof initAssistant === 'function') initAssistant();
+    }, 300);
+    return ret;
+  };
+})();
+
+// Also hook renderAll
+(function() {
+  if (typeof renderAll !== 'undefined') {
+    var origRA = renderAll;
+    renderAll = function() {
+      origRA.apply(this, arguments);
+      setTimeout(function() {
+        if (typeof initAssistant === 'function') initAssistant();
+      }, 300);
+    };
+  }
+})();
+
+// Escaping
 function esc(s) {
   if (!s) return '';
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

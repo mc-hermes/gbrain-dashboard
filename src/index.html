@@ -70,16 +70,43 @@
       <!-- Stat Chips (compact, Today only) -->
       <div class="stat-chips" id="statChips"></div>
 
-      <!-- Assistant -->
-      <div class="live-query-section">
-        <div class="section-header"><h2>Ask</h2><span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span></div>
-        <div class="live-query-bar">
-          <input type="text" id="lqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendAssistantQuery()">
-          <button id="lqBtn" onclick="sendAssistantQuery()">Ask</button>
+      <!-- Assistant — two-panel layout -->
+      <div class="assistant-layout" id="assistantLayout">
+        <!-- Session history sidebar -->
+        <div class="session-sidebar" id="sessionSidebar">
+          <div class="session-sidebar-header">
+            <h3>History</h3>
+            <button class="session-new-btn" onclick="newSession()" title="New conversation">+ New</button>
+          </div>
+          <div class="session-list" id="sessionList"></div>
+          <div class="session-sidebar-footer">
+            <span class="session-count" id="sessionCount"></span>
+          </div>
         </div>
-        <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
-        <div class="lq-error" id="assistantError" style="display:none"></div>
-        <div class="live-query-results" id="assistantResults" style="display:none"></div>
+
+        <!-- Mobile overlay for sidebar -->
+        <div class="session-overlay" id="sessionOverlay" onclick="toggleSessionSidebar(false)"></div>
+
+        <!-- Main chat panel -->
+        <div class="assistant-main">
+          <div class="assistant-main-header">
+            <button class="session-toggle-btn" id="sessionToggleBtn" onclick="toggleSessionSidebar()" title="History">
+              <svg viewBox="0 0 16 16" width="18" height="18"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg>
+            </button>
+            <h2>Ask</h2>
+            <span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span>
+            <span style="flex:1"></span>
+            <button class="session-clear-btn" onclick="newSession()" title="Clear chat">Clear</button>
+          </div>
+          <div class="live-query-bar" id="assistantInputWrap">
+            <input type="text" id="lqInput" placeholder="Ask anything...">
+            <button id="lqBtn">Ask</button>
+          </div>
+          <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
+          <div class="lq-error" id="assistantError" style="display:none"></div>
+          <div class="assistant-messages" id="assistantMessages"></div>
+          <div class="live-query-results" id="assistantResults" style="display:none"></div>
+        </div>
       </div>
 
       <!-- Today Feed -->

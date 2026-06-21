@@ -43,6 +43,18 @@
     .chat-bubble { bottom: 80px; right: 12px; width: 48px; height: 48px; font-size: 1.2rem; }
     .chat-bubble.chat-hidden { bottom: -40px; }
     .chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 80px; height: 480px; max-height: calc(100vh - 100px); border-radius: 12px; }
+
+    /* ─── Assistant panel mobile ─── */
+    .assistant-layout { max-height: none; min-height: 360px; position: relative; }
+    .session-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 85vw; z-index: 60; transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 2px 0 20px rgba(0,0,0,0.5); }
+    .session-sidebar.open { transform: translateX(0); }
+    .session-overlay { display: none; }
+    .session-overlay[style*="display: block"] { display: block !important; }
+    .session-toggle-btn { display: flex; align-items: center; justify-content: center; }
+    .assistant-main-header { padding: 8px 10px; }
+    .assistant-messages { padding: 8px 10px; }
+    .live-query-bar { padding: 0 10px 8px; }
+    .live-query-bar input { font-size: 0.72rem; }
     .docs-modal { flex-direction: column; }
     .docs-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 8px; gap: 4px; }
     .docs-sidebar .docs-tab { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; padding: 8px 12px; font-size: 0.7rem; }

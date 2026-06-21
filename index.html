@@ -574,24 +574,59 @@
   .chat-input-bar input:focus { outline: none; border-color: var(--primary); }
   .chat-input-bar button { padding: 8px 16px; border-radius: 999px; background: var(--primary); border: none; color: #1a1b26; font-size: 0.7rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
 
-  /* ─── Unified Assistant v2 ─── */
-  .assistant-messages { display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px 0; margin-bottom: 12px; }
-  .assistant-welcome { text-align: center; padding: 24px 16px; color: var(--text-muted); font-size: 0.75rem; line-height: 1.6; }
-  .assistant-msg { max-width: 92%; padding: 10px 14px; border-radius: 14px; font-size: 0.72rem; line-height: 1.5; word-break: break-word; }
+  /* ─── Unified Assistant v3 — Panel Layout ─── */
+  .assistant-layout { display: flex; gap: 0; min-height: 420px; max-height: 600px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+  
+  /* Session sidebar */
+  .session-sidebar { width: 260px; min-width: 260px; border-right: 1px solid var(--border); background: var(--surface2); display: flex; flex-direction: column; flex-shrink: 0; }
+  .session-sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .session-sidebar-header h3 { font-size: 0.72rem; font-weight: 600; color: var(--text); margin: 0; }
+  .session-new-btn { background: var(--primary); border: none; color: #1a1b26; font-size: 0.62rem; font-weight: 600; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .session-new-btn:hover { background: var(--primary-light); }
+  .session-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .session-list:empty::after { content: 'No conversations yet'; display: block; padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.68rem; }
+  .session-empty { padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: 0.68rem; line-height: 1.6; }
+  .session-item { position: relative; padding: 10px 14px 10px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.1s; }
+  .session-item:hover { background: rgba(255,255,255,0.03); }
+  .session-item.active { background: rgba(122,162,247,0.08); border-left: 2px solid var(--primary); padding-left: 12px; }
+  .session-item-title { font-size: 0.68rem; color: var(--text); line-height: 1.35; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .session-item-meta { display: flex; gap: 10px; font-size: 0.58rem; color: var(--text-muted); }
+  .session-item-del { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer; opacity: 0; transition: opacity 0.15s; padding: 2px 6px; border-radius: 4px; }
+  .session-item:hover .session-item-del { opacity: 0.6; }
+  .session-item-del:hover { opacity: 1 !important; background: rgba(247,118,142,0.12); color: var(--rose); }
+  .session-sidebar-footer { padding: 8px 14px; border-top: 1px solid var(--border); font-size: 0.58rem; color: var(--text-muted); flex-shrink: 0; }
+  
+  /* Session overlay (mobile) */
+  .session-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 50; }
+  
+  /* Main chat panel */
+  .assistant-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .assistant-main-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .assistant-main-header h2 { font-size: 0.78rem; font-weight: 600; color: var(--text); margin: 0; }
+  .session-toggle-btn { display: none; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; }
+  .session-toggle-btn:hover { color: var(--text); background: var(--surface2); }
+  .session-clear-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.6rem; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .session-clear-btn:hover { border-color: var(--primary); color: var(--primary); }
+  
+  /* Messages area */
+  .assistant-messages { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .assistant-welcome { text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.75rem; line-height: 1.6; }
+  .assistant-msg { max-width: 88%; padding: 8px 12px; border-radius: 12px; font-size: 0.7rem; line-height: 1.5; word-break: break-word; }
   .assistant-msg.user { align-self: flex-end; background: rgba(122,162,247,0.12); color: var(--text); border-bottom-right-radius: 4px; }
   .assistant-msg.assistant { align-self: flex-start; background: var(--surface2); color: var(--text); border-bottom-left-radius: 4px; }
+  .assistant-time { font-size: 0.55rem; color: var(--text-muted); margin-top: 4px; opacity: 0.5; }
   .assistant-text strong { color: var(--primary); }
   .assistant-text blockquote { border-left: 2px solid var(--primary); margin: 4px 0; padding: 2px 8px; font-style: italic; opacity: 0.8; }
-  .assistant-refined { font-size: 0.58rem; color: var(--accent); text-align: right; padding: 4px 0; opacity: 0.7; }
-  .assistant-sources-toggle { width: 100%; padding: 6px 14px; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.62rem; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; }
+  .assistant-refined { font-size: 0.55rem; color: var(--accent); text-align: right; padding-top: 4px; opacity: 0.7; }
+  .assistant-sources-toggle { width: 100%; padding: 5px 10px; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.6rem; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; }
   .assistant-sources-toggle .arrow { transition: transform 0.2s; display: inline-block; }
   .assistant-sources-toggle.open .arrow { transform: rotate(90deg); }
-  .assistant-sources { display: none; padding: 0 14px 8px; }
+  .assistant-sources { display: none; padding: 0 10px 6px; }
   .assistant-sources.open { display: block; }
-  .assistant-source-card { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+  .assistant-source-card { display: flex; align-items: flex-start; gap: 6px; padding: 5px 6px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; transition: background 0.1s; }
   .assistant-source-card:hover { background: rgba(255,255,255,0.03); }
-  .assistant-followups { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 14px 10px; }
-  .assistant-followup-pill { background: rgba(122,162,247,0.08); border: 1px solid rgba(122,162,247,0.15); border-radius: 14px; padding: 4px 12px; font-size: 0.62rem; color: var(--primary); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.1s; }
+  .assistant-followups { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 10px 8px; }
+  .assistant-followup-pill { background: rgba(122,162,247,0.08); border: 1px solid rgba(122,162,247,0.15); border-radius: 12px; padding: 3px 10px; font-size: 0.6rem; color: var(--primary); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.1s; }
   .assistant-followup-pill:hover { border-color: var(--primary); background: rgba(122,162,247,0.12); }
 
   /* ─── Loading ─── */
@@ -646,6 +681,18 @@
     .chat-bubble { bottom: 80px; right: 12px; width: 48px; height: 48px; font-size: 1.2rem; }
     .chat-bubble.chat-hidden { bottom: -40px; }
     .chat-panel { width: calc(100vw - 24px); right: 12px; bottom: 80px; height: 480px; max-height: calc(100vh - 100px); border-radius: 12px; }
+
+    /* ─── Assistant panel mobile ─── */
+    .assistant-layout { max-height: none; min-height: 360px; position: relative; }
+    .session-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 85vw; z-index: 60; transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 2px 0 20px rgba(0,0,0,0.5); }
+    .session-sidebar.open { transform: translateX(0); }
+    .session-overlay { display: none; }
+    .session-overlay[style*="display: block"] { display: block !important; }
+    .session-toggle-btn { display: flex; align-items: center; justify-content: center; }
+    .assistant-main-header { padding: 8px 10px; }
+    .assistant-messages { padding: 8px 10px; }
+    .live-query-bar { padding: 0 10px 8px; }
+    .live-query-bar input { font-size: 0.72rem; }
     .docs-modal { flex-direction: column; }
     .docs-sidebar { width: 100%; display: flex; overflow-x: auto; padding: 8px; gap: 4px; }
     .docs-sidebar .docs-tab { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; padding: 8px 12px; font-size: 0.7rem; }
@@ -916,16 +963,43 @@
       <!-- Stat Chips (compact, Today only) -->
       <div class="stat-chips" id="statChips"></div>
 
-      <!-- Assistant -->
-      <div class="live-query-section">
-        <div class="section-header"><h2>Ask</h2><span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span></div>
-        <div class="live-query-bar">
-          <input type="text" id="lqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendAssistantQuery()">
-          <button id="lqBtn" onclick="sendAssistantQuery()">Ask</button>
+      <!-- Assistant — two-panel layout -->
+      <div class="assistant-layout" id="assistantLayout">
+        <!-- Session history sidebar -->
+        <div class="session-sidebar" id="sessionSidebar">
+          <div class="session-sidebar-header">
+            <h3>History</h3>
+            <button class="session-new-btn" onclick="newSession()" title="New conversation">+ New</button>
+          </div>
+          <div class="session-list" id="sessionList"></div>
+          <div class="session-sidebar-footer">
+            <span class="session-count" id="sessionCount"></span>
+          </div>
         </div>
-        <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
-        <div class="lq-error" id="assistantError" style="display:none"></div>
-        <div class="live-query-results" id="assistantResults" style="display:none"></div>
+
+        <!-- Mobile overlay for sidebar -->
+        <div class="session-overlay" id="sessionOverlay" onclick="toggleSessionSidebar(false)"></div>
+
+        <!-- Main chat panel -->
+        <div class="assistant-main">
+          <div class="assistant-main-header">
+            <button class="session-toggle-btn" id="sessionToggleBtn" onclick="toggleSessionSidebar()" title="History">
+              <svg viewBox="0 0 16 16" width="18" height="18"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg>
+            </button>
+            <h2>Ask</h2>
+            <span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span>
+            <span style="flex:1"></span>
+            <button class="session-clear-btn" onclick="newSession()" title="Clear chat">Clear</button>
+          </div>
+          <div class="live-query-bar" id="assistantInputWrap">
+            <input type="text" id="lqInput" placeholder="Ask anything...">
+            <button id="lqBtn">Ask</button>
+          </div>
+          <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
+          <div class="lq-error" id="assistantError" style="display:none"></div>
+          <div class="assistant-messages" id="assistantMessages"></div>
+          <div class="live-query-results" id="assistantResults" style="display:none"></div>
+        </div>
       </div>
 
       <!-- Today Feed -->
@@ -3338,79 +3412,185 @@ document.addEventListener('keydown', function(e) {
 
   </script>
   <script>
-// ─── Unified Assistant v2 ─────────────────────────────────────────────────
-// Replaces chat.js + live-query.js. Single assistant on Today view.
-// Always uses /api/assistant for synthesized answers.
+// ─── Unified Assistant v3 — Session History ───────────────────────────────
+// localStorage-backed session history. Two-panel layout: sidebar + chat.
 
-let conversationHistory = [];
-const MAX_HISTORY = 6;
+const SESSIONS_KEY = 'gbrain-sessions';
+const MAX_SESSIONS = 50;
+let activeSessionId = null;
 let assistantReady = false;
 
-function initAssistant() {
-  if (assistantReady) return;
-  assistantReady = true;
+// ─── Session storage ──────────────────────────────────────────────────────
 
-  // Wire up the input
-  const input = document.getElementById('lqInput');
-  if (!input) return;
-  input.placeholder = 'Ask anything — e.g. "what should I know before meeting Zaim?"';
-  input.onkeydown = function(e) { if (e.key === 'Enter') sendAssistantQuery(); };
+function loadSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
 
-  const btn = document.getElementById('lqBtn');
-  if (btn) { btn.textContent = 'Ask'; btn.onclick = sendAssistantQuery; }
+function saveSessions(sessions) {
+  if (sessions.length > MAX_SESSIONS) sessions = sessions.slice(-MAX_SESSIONS);
+  try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions)); }
+  catch(e) { /* quota exceeded — drop oldest */ }
+}
 
-  // Hide old search result displays, show chat
-  var lqResults = document.getElementById('lqResults');
-  var lqLoading = document.getElementById('lqLoading');
-  var lqError = document.getElementById('lqError');
-  var lqEmpty = document.getElementById('lqEmpty');
+function getActiveSession() {
+  if (!activeSessionId) return null;
+  var sessions = loadSessions();
+  for (var i = 0; i < sessions.length; i++) {
+    if (sessions[i].id === activeSessionId) return sessions[i];
+  }
+  return null;
+}
 
-  // Create chat messages container if not exists
-  if (!document.getElementById('assistantMessages')) {
-    var msgs = document.createElement('div');
-    msgs.id = 'assistantMessages';
-    msgs.className = 'assistant-messages';
-    msgs.innerHTML = '<div class="assistant-welcome" id="assistantWelcome">' +
-      '👋 <strong>Ask me anything</strong> about your knowledge base.<br><br>' +
-      '<div class="starter-grid">' +
-        '<button class="starter-pill" onclick="askStarter(\'what should i know before my next meeting?\')">Prep for meetings</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'what are my open action items?\')">Action items</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'what happened in my last meeting with Zaim?\')">Last meeting with Zaim</button>' +
-        '<button class="starter-pill" onclick="askStarter(\'show me all people\')">People directory</button>' +
-      '</div>' +
-    '</div>';
+function createSession(firstQuestion) {
+  var id = 'sess-' + Date.now();
+  var session = {
+    id: id,
+    started: new Date().toISOString(),
+    title: firstQuestion.substring(0, 80),
+    messages: []
+  };
+  var sessions = loadSessions();
+  sessions.push(session);
+  if (sessions.length > MAX_SESSIONS) sessions = sessions.slice(-MAX_SESSIONS);
+  saveSessions(sessions);
+  return session;
+}
 
-    // Insert after the live-query-bar
-    var bar = document.querySelector('.live-query-bar');
-    if (bar && bar.parentNode) {
-      bar.parentNode.insertBefore(msgs, bar.nextSibling);
+function saveMessageToSession(role, text, extra) {
+  var sessions = loadSessions();
+  for (var i = 0; i < sessions.length; i++) {
+    if (sessions[i].id === activeSessionId) {
+      var msg = { role: role, text: text, time: new Date().toISOString() };
+      if (extra) {
+        if (extra.sources) msg.sources = extra.sources;
+        if (extra.followups) msg.followups = extra.followups;
+        if (extra.refined) msg.refined = extra.refined;
+      }
+      sessions[i].messages.push(msg);
+      // Update title from first user message if not set
+      if (!sessions[i].title && role === 'user') {
+        sessions[i].title = text.substring(0, 80);
+      }
+      saveSessions(sessions);
+      return;
     }
   }
-
-  // Repurpose loading/error/empty for assistant
-  if (lqLoading) lqLoading.id = 'assistantLoading';
-  if (lqError) lqError.id = 'assistantError';
-  if (lqEmpty) lqEmpty.id = 'assistantEmpty';
-  if (lqResults) { lqResults.style.display = 'none'; lqResults.id = 'assistantResults'; }
-
-  // Hide old mobile query elements
-  var mqInput = document.getElementById('mqInput');
-  var mqThread = document.getElementById('mqThread');
-  if (mqInput) mqInput.style.display = 'none';
-  if (mqThread) mqThread.style.display = 'none';
 }
 
-// Called after data loads
-if (typeof DATA !== 'undefined' || typeof MCP_CONNECTED !== 'undefined') {
-  initAssistant();
-} else {
-  // Wait for data
-  var _origLoadData = loadData;
-  loadData = function() {
-    _origLoadData.apply(this, arguments);
-    setTimeout(initAssistant, 500);
-  };
+function deleteSession(id) {
+  var sessions = loadSessions().filter(function(s) { return s.id !== id; });
+  saveSessions(sessions);
+  if (activeSessionId === id) {
+    activeSessionId = null;
+    renderChatWelcome();
+  }
+  renderSessionList();
 }
+
+// ─── UI: Session list sidebar ──────────────────────────────────────────────
+
+function renderSessionList() {
+  var list = document.getElementById('sessionList');
+  if (!list) return;
+  var sessions = loadSessions();
+  // Newest first
+  sessions.reverse();
+
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="session-empty">No past conversations.<br><br>Ask a question to start.</div>';
+    return;
+  }
+
+  var html = '';
+  sessions.forEach(function(s) {
+    var isActive = s.id === activeSessionId;
+    var msgCount = s.messages.length;
+    var time = formatSessionTime(s.started);
+    var title = s.title || 'Untitled';
+    html += '<div class="session-item' + (isActive ? ' active' : '') + '" onclick="loadSession(\'' + escAttr(s.id) + '\')">' +
+      '<div class="session-item-title">' + esc(title) + '</div>' +
+      '<div class="session-item-meta"><span>' + time + '</span><span>' + msgCount + ' msg' + (msgCount !== 1 ? 's' : '') + '</span></div>' +
+      '<button class="session-item-del" onclick="event.stopPropagation();deleteSession(\'' + escAttr(s.id) + '\')" title="Delete">×</button>' +
+    '</div>';
+  });
+
+  // Restore original order for storage
+  sessions.reverse();
+  list.innerHTML = html;
+}
+
+function formatSessionTime(iso) {
+  try {
+    var d = new Date(iso);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago';
+    return d.toLocaleDateString();
+  } catch(e) { return ''; }
+}
+
+// ─── Load / New session ────────────────────────────────────────────────────
+
+function loadSession(id) {
+  activeSessionId = id;
+  var session = getActiveSession();
+  if (!session) { activeSessionId = null; renderChatWelcome(); return; }
+  renderSessionList();
+  renderSessionMessages(session);
+  // On mobile, close sidebar
+  if (window.innerWidth < 768) toggleSessionSidebar(false);
+}
+
+function newSession() {
+  activeSessionId = null;
+  renderSessionList();
+  renderChatWelcome();
+  var input = document.getElementById('lqInput');
+  if (input) { input.value = ''; input.focus(); }
+}
+
+function renderChatWelcome() {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+  msgs.innerHTML = '<div class="assistant-welcome" id="assistantWelcome">' +
+    '👋 <strong>Ask me anything</strong> about your knowledge base.<br><br>' +
+    '<div class="starter-grid">' +
+      '<button class="starter-pill" onclick="askStarter(\'what should i know before my next meeting?\')">Prep for meetings</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'what are my open action items?\')">Action items</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'what happened in my last meeting with Zaim?\')">Last meeting with Zaim</button>' +
+      '<button class="starter-pill" onclick="askStarter(\'show me all people\')">People directory</button>' +
+    '</div>' +
+  '</div>';
+  document.getElementById('assistantInputWrap').style.display = '';
+}
+
+function renderSessionMessages(session) {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+  msgs.innerHTML = '';
+  document.getElementById('assistantWelcome') && (document.getElementById('assistantWelcome').style.display = 'none');
+  document.getElementById('assistantInputWrap').style.display = '';
+
+  session.messages.forEach(function(m) {
+    if (m.role === 'user') {
+      addAssistantBubble(esc(m.text), 'user', m.time);
+    } else {
+      addAssistantResponse({
+        response: m.text,
+        sources: m.sources || [],
+        followups: m.followups || [],
+        refined: m.refined || false
+      }, m.time);
+    }
+  });
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── Chat interface ────────────────────────────────────────────────────────
 
 function sendAssistantQuery() {
   var input = document.getElementById('lqInput');
@@ -3423,14 +3603,20 @@ function sendAssistantQuery() {
   var welcome = document.getElementById('assistantWelcome');
   if (welcome) welcome.style.display = 'none';
 
-  var msgs = document.getElementById('assistantMessages');
   var loading = document.getElementById('assistantLoading');
   var error = document.getElementById('assistantError');
+  var msgs = document.getElementById('assistantMessages');
+
+  // Create session if needed
+  if (!activeSessionId) {
+    var session = createSession(q);
+    activeSessionId = session.id;
+    renderSessionList();
+  }
 
   // Add user message
   addAssistantBubble(esc(q), 'user');
-  conversationHistory.push({ role: 'user', text: q });
-  if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+  saveMessageToSession('user', q);
 
   // Show thinking
   if (loading) loading.style.display = 'block';
@@ -3444,60 +3630,58 @@ function sendAssistantQuery() {
     .then(function(data) {
       if (loading) loading.style.display = 'none';
       addAssistantResponse(data);
-      conversationHistory.push({ role: 'assistant', text: (data.response || '').substring(0, 200) });
-      if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+      saveMessageToSession('assistant', data.response || '', {
+        sources: data.sources,
+        followups: data.followups,
+        refined: data.refined
+      });
+      // Update session list title if this was first question
+      renderSessionList();
+      msgs.scrollTop = msgs.scrollHeight;
     })
     .catch(function(err) {
       if (loading) loading.style.display = 'none';
       if (error) { error.textContent = 'Failed to reach the assistant — ' + err.message; error.style.display = 'block'; }
-
-      // Still show the error in chat
-      var d = document.createElement('div');
-      d.className = 'assistant-msg assistant';
-      d.innerHTML = '<div class="assistant-body"><div class="assistant-text">Sorry, I couldn\'t reach the knowledge base. Is the API server running?</div></div>';
-      if (msgs) msgs.appendChild(d);
+      addAssistantBubble('Sorry, I couldn\'t reach the knowledge base. Is the API server running?', 'assistant');
+      saveMessageToSession('assistant', 'Error: ' + err.message);
     })
     .finally(function() { if (btn) btn.disabled = false; });
 }
 
-function addAssistantBubble(html, role) {
+function addAssistantBubble(text, role, time) {
   var msgs = document.getElementById('assistantMessages');
   if (!msgs) return;
   var d = document.createElement('div');
   d.className = 'assistant-msg ' + role;
-  d.innerHTML = '<div class="assistant-body"><div class="assistant-text">' + html + '</div></div>';
+  var inner = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(text) + '</div>';
+  if (time) inner += '<div class="assistant-time">' + formatSessionTime(time) + '</div>';
+  inner += '</div>';
+  d.innerHTML = inner;
   msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function formatAssistantText(text) {
-  var html = esc(text);
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/(?:^|\n)> (.+)/g, '<blockquote>$1</blockquote>');
-  html = html.replace(/\n\n/g, '<br><br>');
-  html = html.replace(/\n/g, '<br>');
-  return html.replace(/^(<br>)+/, '');
-}
-
-function addAssistantResponse(data) {
+function addAssistantResponse(data, time) {
   var msgs = document.getElementById('assistantMessages');
   if (!msgs) return;
 
   var d = document.createElement('div');
   d.className = 'assistant-msg assistant';
+  var html = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(data.response || 'No response') + '</div>';
 
-  // Response text
-  var html = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(data.response || 'No response') + '</div></div>';
+  // Time stamp
+  if (time) html += '<div class="assistant-time">' + formatSessionTime(time) + '</div>';
 
   // Refined badge
   if (data.refined) {
-    html += '<div class="assistant-refined">✨ Synthesized with AI</div>';
+    html += '<div class="assistant-refined">✨ Synthesized</div>';
   }
+
+  html += '</div>';
 
   // Sources
   if (data.sources && data.sources.length > 0) {
-    var srcCount = data.sources.length;
-    html += '<button class="assistant-sources-toggle" onclick="toggleAssistantSources(this)">' + srcCount + ' source' + (srcCount !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
+    html += '<button class="assistant-sources-toggle" onclick="toggleAssistantSources(this)">' + data.sources.length + ' source' + (data.sources.length !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
     html += '<div class="assistant-sources">';
     data.sources.forEach(function(s) {
       var name = s.slug.split('/').pop().replace(/-/g, ' ').replace(/_/g, ' ');
@@ -3520,6 +3704,37 @@ function addAssistantResponse(data) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
+// ─── Sidebar toggle ────────────────────────────────────────────────────────
+
+function toggleSessionSidebar(force) {
+  var sidebar = document.getElementById('sessionSidebar');
+  var overlay = document.getElementById('sessionOverlay');
+  if (!sidebar) return;
+  var isOpen = sidebar.classList.contains('open');
+  var shouldOpen = force !== undefined ? force : !isOpen;
+
+  if (shouldOpen) {
+    sidebar.classList.add('open');
+    if (overlay) overlay.style.display = 'block';
+    renderSessionList();
+  } else {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.style.display = 'none';
+  }
+}
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+
+function formatAssistantText(text) {
+  if (!text) return '';
+  var html = esc(text);
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(?:^|\n)> (.+)/g, '<blockquote>$1</blockquote>');
+  html = html.replace(/\n\n/g, '<br><br>');
+  html = html.replace(/\n/g, '<br>');
+  return html.replace(/^(<br>)+/, '');
+}
+
 function toggleAssistantSources(btn) {
   btn.classList.toggle('open');
   btn.nextElementSibling.classList.toggle('open');
@@ -3535,15 +3750,58 @@ function askFollowup(q) {
   if (input) { input.value = q; sendAssistantQuery(); }
 }
 
-function clearAssistantChat() {
-  var msgs = document.getElementById('assistantMessages');
-  var welcome = document.getElementById('assistantWelcome');
-  if (msgs) msgs.innerHTML = '';
-  if (welcome) { msgs.appendChild(welcome); welcome.style.display = ''; }
-  conversationHistory = [];
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+function initAssistant() {
+  if (assistantReady) return;
+  assistantReady = true;
+
+  var input = document.getElementById('lqInput');
+  if (!input) return;
+  input.placeholder = 'Ask anything — e.g. "what should I know before meeting Zaim?"';
+  input.onkeydown = function(e) { if (e.key === 'Enter') sendAssistantQuery(); };
+
+  var btn = document.getElementById('lqBtn');
+  if (btn) { btn.textContent = 'Ask'; btn.onclick = sendAssistantQuery; }
+
+  // Hide old elements
+  var lqResults = document.getElementById('lqResults');
+  var lqLoading = document.getElementById('lqLoading');
+  var lqError = document.getElementById('lqError');
+  if (lqResults) lqResults.style.display = 'none';
+  if (lqLoading) { lqLoading.id = 'assistantLoading'; lqLoading.style.display = 'none'; }
+  if (lqError) { lqError.id = 'assistantError'; lqError.style.display = 'none'; }
+
+  renderSessionList();
+  renderChatWelcome();
 }
 
-// ─── Escaping helpers (shared) ───
+// Wire up after data loads
+(function() {
+  var orig = loadData;
+  loadData = function() {
+    var ret = orig.apply(this, arguments);
+    setTimeout(function() {
+      if (typeof initAssistant === 'function') initAssistant();
+    }, 300);
+    return ret;
+  };
+})();
+
+// Also hook renderAll
+(function() {
+  if (typeof renderAll !== 'undefined') {
+    var origRA = renderAll;
+    renderAll = function() {
+      origRA.apply(this, arguments);
+      setTimeout(function() {
+        if (typeof initAssistant === 'function') initAssistant();
+      }, 300);
+    };
+  }
+})();
+
+// Escaping
 function esc(s) {
   if (!s) return '';
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
