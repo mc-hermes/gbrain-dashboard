@@ -149,6 +149,8 @@ If you're generating your own `gbrain-data.json`:
 
 ---
 
+Want to contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

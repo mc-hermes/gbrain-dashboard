@@ -1,0 +1,26 @@
+  /* ─── Base ─── */
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+    font-variant-numeric: tabular-nums;
+  }
+  body.modal-open { overflow: hidden; }
+  ::selection { background: rgba(122,162,247,0.25); color: var(--text); }
+
+  /* ─── Typography ─── */
+  h1, h2, h3, h4, .display-font {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .mono, code, .slug-text, .lq-path, .m-slug, .stat-card .value,
+  .fc-time, .last-updated, .graph-zoom-label, .kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* ─── Grid ─── */
+  .app { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }

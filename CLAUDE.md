@@ -61,7 +61,16 @@ gbrain-data.json
 
 ## Architecture
 
-### `index.html`
+### Source files (`src/`)
+
+The dashboard is built from modular source files. Edit these, run `./build.sh` to regenerate `index.html`.
+
+| Directory | Files | Purpose |
+|-----------|-------|---------|
+| `src/css/` | 5 files | Stylesheets (tokens, base, layout, components, mobile) |
+| `src/js/` | 15 files | JavaScript modules (core, mcp, data, feed, graph, browse, modal, crud, crm, theme, docs, chat, live-query, write, logs) |
+| `src/index.html` | 1 file | HTML skeleton with `<!-- INJECT:css/... -->` and `<!-- INJECT:js/... -->` markers |
+| `build.sh` | 1 file | Concatenation script — zero dependencies |
 
 The main interactive dashboard — a single self-contained HTML file (~2900 lines). No framework, vanilla JS throughout.
 

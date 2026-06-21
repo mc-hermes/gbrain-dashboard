@@ -1,0 +1,109 @@
+  /* ═══════════════════════════════════════════════
+     gbrain dashboard — Tokyo Night Design System
+     ═══════════════════════════════════════════════ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ─── Design Tokens (Tokyo Night) ─── */
+  :root {
+    --bg: #1a1b26; --surface: #24283b; --surface2: #2f3346; --border: #3b4261;
+    --primary: #7aa2f7; --primary-light: #7dcfff; --accent: #e0af68; --accent-light: #ff9e64;
+    --text: #c0caf5; --text-muted: #9aa5ce; --green: #9ece6a; --violet: #bb9af7;
+    --rose: #f7768e; --graph-bg: #1a1b26;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  body.light {
+    --bg: #f4f8fb; --surface: #ffffff; --surface2: #f1f5f9; --border: #dce4ec;
+    --primary: #3366cc; --primary-light: #0e7490; --accent: #9a7b2c; --accent-light: #b8860b;
+    --text: #1e293b; --text-muted: #64748b; --green: #059669; --violet: #7c3aed;
+    --rose: #e11d48; --graph-bg: #f8fafc;
+  }
+  body.catppuccin-mocha {
+    --bg: #1e1e2e; --surface: #313244; --surface2: #45475a; --border: #585b70;
+    --primary: #89b4fa; --primary-light: #74c7ec; --accent: #f9e2af; --accent-light: #fab387;
+    --text: #cdd6f4; --text-muted: #a6adc8; --green: #a6e3a1; --violet: #cba6f7;
+    --rose: #f38ba8; --graph-bg: #1e1e2e;
+  }
+  body.catppuccin-latte {
+    --bg: #eff1f5; --surface: #e6e9ef; --surface2: #ccd0da; --border: #bcc0cc;
+    --primary: #1e66f5; --primary-light: #04a5e5; --accent: #df8e1d; --accent-light: #fe640b;
+    --text: #4c4f69; --text-muted: #8c8fa1; --green: #40a02b; --violet: #8839ef;
+    --rose: #d20f39; --graph-bg: #eff1f5;
+  }
+  body.omarchy {
+    --bg: #faf6f0; --surface: #ffffff; --surface2: #f5efe6; --border: #d4c9b8;
+    --primary: #8b4513; --primary-light: #a0522d; --accent: #b8860b; --accent-light: #cd853f;
+    --text: #2c1810; --text-muted: #6b5b4f; --green: #5d7a3a; --violet: #6b3fa0;
+    --rose: #c0392b; --graph-bg: #faf6f0;
+  }
+  /* ─── Library Theme (default) — warm academic library aesthetic ─── */
+  body.library {
+    --bg: #faf8f5; --surface: #ffffff; --surface2: #f5efe8; --border: #d9cfbf;
+    --primary: #5c3d2e; --primary-light: #8b6b3d; --accent: #8b6914; --accent-light: #b8860b;
+    --text: #2c1810; --text-muted: #7a6b5d; --green: #4a7c3f; --violet: #6b3fa0;
+    --rose: #b22222; --graph-bg: #faf8f5;
+    --radius: 6px; --radius-sm: 4px;
+  }
+  /* Library: typography — serif headings, comfortable reading body */
+  body.library { font-family: 'Crimson Text', 'Georgia', 'Inter', serif; }
+  body.library h1, body.library h2, body.library h3, body.library h4,
+  body.library .display-font, body.library .header-left h1,
+  body.library .fc-title, body.library .dc-title, body.library .stat-chip .sc-value,
+  body.library .stat-card .value, body.library .entity-card .name,
+  body.library .modal-header .m-title, body.library .docs-content h2,
+  body.library .docs-content h3, body.library .live-query-section .section-header h2,
+  body.library .section-header h2, body.library .feed-section h2,
+  body.library .wc-title, body.library .token-dialog h3 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  /* Library: subtle paper grain texture */
+  body.library {
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+  }
+  /* Library: card-catalog aesthetics */
+  body.library .stat-card, body.library .feed-card, body.library .entity-card,
+  body.library .digest-card, body.library .health-item, body.library .artifact-card,
+  body.library .lq-card {
+    box-shadow: 0 1px 2px rgba(44,24,16,0.04), 0 1px 3px rgba(44,24,16,0.03);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+  body.library .feed-card:hover, body.library .entity-card:hover,
+  body.library .stat-card:hover, body.library .digest-card:hover,
+  body.library .artifact-card:hover {
+    box-shadow: 0 4px 16px rgba(44,24,16,0.08);
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+  body.library .health-item:hover { box-shadow: 0 2px 8px rgba(44,24,16,0.06); border-color: var(--primary-light); }
+  /* Library: shelf dividers */
+  body.library .section { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 8px; }
+  body.library .section:first-of-type { border-top: none; padding-top: 0; }
+  body.library .feed-section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 4px; }
+  body.library .feed-section:first-of-type { border-top: none; padding-top: 0; }
+  /* Library: reading-room modal */
+  body.library .modal { box-shadow: 0 12px 40px rgba(44,24,16,0.15); border: 1px solid var(--border); }
+  body.library .modal-body .m-content { font-family: 'Crimson Text', 'Georgia', serif; font-size: 0.88rem; line-height: 1.85; }
+  body.library .modal-body .m-content strong { color: var(--primary); font-weight: 700; }
+  /* Library: stat chips */
+  body.library .stat-chip { box-shadow: 0 1px 2px rgba(44,24,16,0.05); border-radius: 999px; }
+  /* Library: digest card */
+  body.library .digest-card { border-left: 3px solid var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(139,105,20,0.03) 100%); }
+  /* Library: header */
+  body.library .header-left h1 span { color: var(--primary); font-style: italic; }
+  body.library .header-left .sub { font-style: italic; color: var(--text-muted); }
+  /* Library: feed card link line */
+  body.library .feed-card .fc-link-line { background: var(--accent); }
+  /* Library: table */
+  body.library th { background: var(--surface2); font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+  body.library tr.page-row:hover td { background: rgba(92,61,46,0.03); }
+  /* Library: mobile nav */
+  body.library .mobile-nav { background: var(--surface); border-top: 1px solid var(--border); box-shadow: 0 -2px 12px rgba(44,24,16,0.04); }
+  /* Library: scrollbar */
+  body.library ::-webkit-scrollbar { width: 8px; }
+  body.library ::-webkit-scrollbar-track { background: var(--bg); }
+  body.library ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  body.library ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
