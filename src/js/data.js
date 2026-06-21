@@ -63,11 +63,44 @@ async function loadData(source) {
       }
     }
 
-    // Priority 4: default
+    // Priority 4: default gbrain-data.json (fast timeout)
     if (!data) {
-      var res3 = await fetchWithTimeout('gbrain-data.json', null, 8000);
-      if (!res3.ok) throw new Error('HTTP ' + res3.status);
-      data = await res3.json();
+      try {
+        var res3 = await fetchWithTimeout('gbrain-data.json', null, 4000);
+        if (res3.ok) {
+          data = await res3.json();
+        }
+      } catch(e) {
+        // Silently fail — show connect prompt below
+      }
+    }
+
+    // If we got data but it's empty (0 pages), treat as no data for a cleaner UX
+    if (data && (!data.pages || data.pages.length === 0) && !MCP_CONNECTED) {
+      data = null;
+    }
+
+    if (!data) {
+      // No data at all — show connect prompt, not an error
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      // Show Today view with the connect prompt
+      showView('today');
+      document.getElementById('lastUpdated').textContent = 'No data loaded';
+      document.getElementById('dataSource').textContent = '⚡ Connect';
+      document.getElementById('dataSource').title = 'Tap to connect gbrain or upload';
+      document.getElementById('dataSource').style.color = 'var(--primary-light)';
+      document.getElementById('dataSource').style.cursor = 'pointer';
+      // Hide stat chips, show connect message in feed area
+      var chips = document.getElementById('statChips');
+      if (chips) chips.innerHTML = '';
+      var feed = document.getElementById('feedCards');
+      if (feed) feed.innerHTML = '<div class="empty-state" style="padding:40px 20px;text-align:center"><div class="empty-title">Connect your brain</div><div class="empty-desc" style="margin-bottom:16px">Tap ⚙️ above or <b>⚡ Connect</b> next to the title, then paste your gbrain MCP URL.<br><br>Or upload a <code>gbrain-data.json</code> file.</div><button onclick="openLoadDataModal()" style="padding:10px 24px;background:var(--primary);border:none;border-radius:999px;color:#1a1b26;font-size:0.8rem;font-weight:600;cursor:pointer">⚡ Connect to gbrain</button></div>';
+      var digest = document.getElementById('digestSlot');
+      if (digest) digest.innerHTML = '';
+      // Init assistant even without data
+      if (typeof initAssistant === 'function') initAssistant();
+      return;
     }
 
     DATA = data;

@@ -286,6 +286,14 @@
   <div class="settings-row" style="margin-top:6px">
     <button class="graph-reset" style="position:static;display:block;width:100%;text-align:center" onclick="resetGraph()">↺ Reset graph positions</button>
   </div>
+  <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+  <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+    <span style="font-size:0.65rem;font-weight:600">API Server URL</span>
+    <div style="display:flex;gap:6px;width:100%">
+      <input type="text" id="apiUrlInput" placeholder="http://localhost:8080" style="flex:1;padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.62rem;font-family:'JetBrains Mono',monospace" onchange="saveApiUrl()">
+      <button onclick="saveApiUrl()" style="padding:4px 10px;background:var(--primary);border:none;border-radius:6px;color:#1a1b26;font-size:0.6rem;font-weight:600;cursor:pointer">Save</button>
+    </div>
+  </div>
 </div>
 <!-- Floating Buttons -->
 <div class="float-btns">

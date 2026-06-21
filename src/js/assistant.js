@@ -209,7 +209,26 @@ function sendAssistantQuery() {
   if (error) error.style.display = 'none';
 
   var API_BASE = localStorage.getItem('gbrain-query-api') || '';
+  // If no API URL configured, try same-host port 8080 (gbrain-api-server default)
+  if (!API_BASE) {
+    // Don't try localhost on GitHub Pages — show setup prompt
+    var host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('100.') || host.startsWith('192.168.') || host.endsWith('.ts.net')) {
+      API_BASE = window.location.protocol + '//' + host + ':8080';
+    }
+  }
   var url = API_BASE + '/api/assistant?q=' + encodeURIComponent(q) + '&model=deepseek';
+
+  // If still no API URL, show setup prompt
+  if (!API_BASE) {
+    if (loading) loading.style.display = 'none';
+    addAssistantResponse({
+      response: "I can't reach the knowledge base yet. You need to configure the gbrain API server URL.\n\nTap the ⚙️ Settings icon and enter your API URL (usually http://your-server:8080).",
+      followups: ['Open Settings']
+    });
+    if (btn) btn.disabled = false;
+    return;
+  }
 
   fetch(url)
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -309,7 +328,30 @@ function toggleSessionSidebar(force) {
   }
 }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ─── Settings ─────────────────────────────────────────────────────────────
+
+function saveApiUrl() {
+  var input = document.getElementById('apiUrlInput');
+  if (!input) return;
+  var url = input.value.trim().replace(/\/$/, '');
+  if (url) {
+    localStorage.setItem('gbrain-query-api', url);
+  } else {
+    localStorage.removeItem('gbrain-query-api');
+  }
+}
+
+// Auto-populate settings input when popover opens
+(function() {
+  var origToggleSettings = toggleSettings;
+  toggleSettings = function() {
+    origToggleSettings.apply(this, arguments);
+    setTimeout(function() {
+      var input = document.getElementById('apiUrlInput');
+      if (input) input.value = localStorage.getItem('gbrain-query-api') || '';
+    }, 100);
+  };
+})();
 
 function formatAssistantText(text) {
   if (!text) return '';
