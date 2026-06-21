@@ -574,6 +574,26 @@
   .chat-input-bar input:focus { outline: none; border-color: var(--primary); }
   .chat-input-bar button { padding: 8px 16px; border-radius: 999px; background: var(--primary); border: none; color: #1a1b26; font-size: 0.7rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
 
+  /* ─── Unified Assistant v2 ─── */
+  .assistant-messages { display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px 0; margin-bottom: 12px; }
+  .assistant-welcome { text-align: center; padding: 24px 16px; color: var(--text-muted); font-size: 0.75rem; line-height: 1.6; }
+  .assistant-msg { max-width: 92%; padding: 10px 14px; border-radius: 14px; font-size: 0.72rem; line-height: 1.5; word-break: break-word; }
+  .assistant-msg.user { align-self: flex-end; background: rgba(122,162,247,0.12); color: var(--text); border-bottom-right-radius: 4px; }
+  .assistant-msg.assistant { align-self: flex-start; background: var(--surface2); color: var(--text); border-bottom-left-radius: 4px; }
+  .assistant-text strong { color: var(--primary); }
+  .assistant-text blockquote { border-left: 2px solid var(--primary); margin: 4px 0; padding: 2px 8px; font-style: italic; opacity: 0.8; }
+  .assistant-refined { font-size: 0.58rem; color: var(--accent); text-align: right; padding: 4px 0; opacity: 0.7; }
+  .assistant-sources-toggle { width: 100%; padding: 6px 14px; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.62rem; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; }
+  .assistant-sources-toggle .arrow { transition: transform 0.2s; display: inline-block; }
+  .assistant-sources-toggle.open .arrow { transform: rotate(90deg); }
+  .assistant-sources { display: none; padding: 0 14px 8px; }
+  .assistant-sources.open { display: block; }
+  .assistant-source-card { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+  .assistant-source-card:hover { background: rgba(255,255,255,0.03); }
+  .assistant-followups { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 14px 10px; }
+  .assistant-followup-pill { background: rgba(122,162,247,0.08); border: 1px solid rgba(122,162,247,0.15); border-radius: 14px; padding: 4px 12px; font-size: 0.62rem; color: var(--primary); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.1s; }
+  .assistant-followup-pill:hover { border-color: var(--primary); background: rgba(122,162,247,0.12); }
+
   /* ─── Loading ─── */
   .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.8rem; gap: 16px; }
   .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
@@ -849,7 +869,6 @@
   <button class="sidebar-item active" data-view="today" onclick="showView('today')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg></span><span class="s-label">Today</span></button>
   <button class="sidebar-item" data-view="browse" onclick="showView('browse')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Library</span></button>
   <button class="sidebar-item" data-view="graph" onclick="showView('graph')"><span class="s-icon"><svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg></span><span class="s-label">Graph</span></button>
-  <button class="sidebar-item" data-view="ask" onclick="showView('ask')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Ask</span></button>
   <button class="sidebar-item" data-view="logs" onclick="showView('logs')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 6.5h10M3 10h7M3 13h5" stroke="currentColor" stroke-linecap="round"/></svg></span><span class="s-label">Activity</span></button>
   <div class="sidebar-spacer"></div>
   <button class="sidebar-item write-btn" onclick="openWrite()"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 13h10M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="s-label">Write</span></button>
@@ -885,7 +904,6 @@
     <div class="tabs desktop-view-tabs" id="desktopViewTabs" style="margin-bottom:16px">
       <button class="tab active" data-dview="today" onclick="showView('today')"><span class="tab-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg></span> Today</button>
       <button class="tab" data-dview="browse" onclick="showView('browse')"><span class="tab-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/></svg></span> Browse</button>
-      <button class="tab" data-dview="ask" onclick="showView('ask')"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span> Ask</button>
       <button class="tab" data-dview="graph" onclick="showView('graph')"><span class="tab-icon"><svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg></span> Graph</button>
       <button class="tab" data-dview="logs" onclick="showView('logs')"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 6.5h10M3 10h7M3 13h5" stroke="currentColor" stroke-linecap="round"/></svg></span> Logs</button>
       <button class="tab write-tab-item" onclick="openWrite()"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M3 13h10M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> Write</button>
@@ -898,17 +916,16 @@
       <!-- Stat Chips (compact, Today only) -->
       <div class="stat-chips" id="statChips"></div>
 
-      <!-- Live Query -->
+      <!-- Assistant -->
       <div class="live-query-section">
-        <div class="section-header"><h2>Ask</h2></div>
+        <div class="section-header"><h2>Ask</h2><span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span></div>
         <div class="live-query-bar">
-          <input type="text" id="lqInput" placeholder="Ask anything about your brain..." onkeydown="if(event.key==='Enter') runLiveQuery()">
-          <button id="lqBtn" onclick="runLiveQuery()">Ask</button>
+          <input type="text" id="lqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendAssistantQuery()">
+          <button id="lqBtn" onclick="sendAssistantQuery()">Ask</button>
         </div>
-        <div class="lq-loading" id="lqLoading"><span class="spinner"></span> Querying brain...</div>
-        <div class="lq-error" id="lqError"></div>
-        <div class="lq-empty" id="lqEmpty">No results found.</div>
-        <div class="live-query-results" id="lqResults"></div>
+        <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
+        <div class="lq-error" id="assistantError" style="display:none"></div>
+        <div class="live-query-results" id="assistantResults" style="display:none"></div>
       </div>
 
       <!-- Today Feed -->
@@ -985,23 +1002,6 @@
       </div>
     </div>
 
-    <!-- === VIEW: Ask (mobile chat-style) === -->
-    <div class="view-panel" id="view-ask">
-      <div class="live-query-section" style="margin-bottom:8px">
-        <div class="section-header"><h2>Ask</h2></div>
-        <div class="live-query-bar">
-          <input type="text" id="mqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') runMobileQuery()">
-          <button onclick="runMobileQuery()">Ask</button>
-        </div>
-        <div class="lq-loading" id="mqLoading"><span class="spinner"></span> Querying...</div>
-        <div class="lq-error" id="mqError"></div>
-        <div class="lq-empty" id="mqEmpty">No results found.</div>
-        <div class="live-query-results" id="mqResults"></div>
-      </div>
-      <!-- Chat-style result thread -->
-      <div id="mqThread"></div>
-    </div>
-
     <!-- === VIEW: Logs (live workflow activity) === -->
     <div class="view-panel" id="view-logs">
       <div class="section">
@@ -1058,9 +1058,6 @@
     <button class="nav-write-btn" onclick="openWrite()" title="Write a note">
       <svg viewBox="0 0 16 16"><path d="M3 13h10M8 2v10M3 7h10" stroke="currentColor" stroke-linecap="round"/></svg>
     </button>
-    <button class="mobile-nav-btn" data-view="ask" onclick="showView('ask')">
-      <span class="nav-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span> Ask
-    </button>
     <button class="mobile-nav-btn" data-view="more" onclick="toggleMoreMenu()">
       <span class="nav-icon">···</span> More
     </button>
@@ -1109,43 +1106,15 @@
     <button class="graph-reset" style="position:static;display:block;width:100%;text-align:center" onclick="resetGraph()">↺ Reset graph positions</button>
   </div>
 </div>
+<!-- Floating Buttons -->
+<div class="float-btns">
+<button class="float-btn cog-btn" onclick="toggleSettings()" title="Settings"><svg viewBox="0 0 16 16" width="20" height="20"><circle cx="8" cy="8" r="2.5" stroke="currentColor" fill="none"/><path d="M8 2v1.5M8 12.5v1.5M2 8h1.5M12.5 8h1.5M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor"/></svg></button>
+<button class="float-btn help-btn" onclick="openDocs()" title="Help &amp; Documentation (press ?)">?</button>
+</div>
 
 <!-- Modal Overlay -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
   <div class="modal" id="modal" onclick="event.stopPropagation()"></div>
-</div>
-
-<!-- Chat Bubble (desktop) -->
-<button class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Chat with gbrain assistant"><svg viewBox="0 0 16 16" width="20" height="20"><path d="M2 2h12v9H6l-4 3V2z" stroke="#1a1b26" fill="none" stroke-width="1.5"/></svg></button>
-<div class="chat-panel" id="chatPanel">
-  <div class="chat-header">
-    <h3>Assistant</h3>
-    <div class="chat-header-actions">
-      <select id="chatModel" onchange="switchModel()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);border-radius:6px;padding:4px 8px;font-size:0.68rem;font-family:'Inter',sans-serif;cursor:pointer;outline:none">
-        <option value="deepseek">DeepSeek Flash</option>
-        <option value="claude-haiku">Claude Haiku</option>
-      </select>
-      <button class="chat-clear" onclick="clearChat()" title="Clear conversation">Clear</button>
-      <button onclick="toggleChat()">✕</button>
-    </div>
-  </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-welcome" id="chatWelcome">
-      👋 I'm your gbrain assistant — I can search your knowledge base and synthesize answers.<br><br>
-      <strong>Try asking:</strong>
-      <div class="starter-grid">
-        <button class="starter-pill" onclick="askStarter('who have I met with recently?')">Who have I met with?</button>
-        <button class="starter-pill" onclick="askStarter('what projects am I working on?')">What projects?</button>
-        <button class="starter-pill" onclick="askStarter('show me recent meetings')">Recent meetings</button>
-        <button class="starter-pill" onclick="askStarter('what is this dashboard')">About this dashboard</button>
-      </div>
-    </div>
-  </div>
-  <div class="chat-typing" id="chatTyping">Thinking<span class="typing-dots">...</span></div>
-  <div class="chat-input-bar">
-    <input type="text" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()">
-    <button id="chatSendBtn" onclick="sendChat()">Send</button>
-  </div>
 </div>
 
 <!-- Docs Overlay -->
@@ -1226,6 +1195,8 @@ let healthRendered = false;
 let artifactsRendered = false;
 // ─── VIEW SWAPPING ───
 function showView(name) {
+  // Redirect removed 'ask' view to today (unified assistant)
+  if (name === 'ask') name = 'today';
   activeView = name;
   // Hide all view panels
   document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
@@ -1915,6 +1886,8 @@ function renderAll() {
   document.querySelectorAll('#feedSourceTabs .feed-source-tab').forEach(t => {
     t.onclick = function(){ filterFeed(this.getAttribute('data-src')); };
   });
+  // Init the unified assistant after render
+  if (typeof initAssistant === 'function') initAssistant();
 }
   </script>
   <script>
@@ -3365,250 +3338,220 @@ document.addEventListener('keydown', function(e) {
 
   </script>
   <script>
-// ─── MOBILE ASK ───
-function runMobileQuery() {
-  const input = document.getElementById('mqInput');
-  const results = document.getElementById('mqResults');
-  const loading = document.getElementById('mqLoading');
-  const error = document.getElementById('mqError');
-  const empty = document.getElementById('mqEmpty');
-  const thread = document.getElementById('mqThread');
-  const q = input.value.trim();
-  if (!q) return;
-  input.value = '';
-  results.innerHTML = '';
-  error.style.display = 'none';
-  empty.style.display = 'none';
-  loading.style.display = 'block';
+// ─── Unified Assistant v2 ─────────────────────────────────────────────────
+// Replaces chat.js + live-query.js. Single assistant on Today view.
+// Always uses /api/assistant for synthesized answers.
 
-  // Add question to thread
-  thread.innerHTML += `<div style="text-align:right;margin-bottom:8px"><span style="background:rgba(34,211,238,0.1);padding:8px 14px;border-radius:14px;font-size:0.72rem">${esc(q)}</span></div>`;
-
-  const API_BASE = localStorage.getItem('gbrain-query-api') || '';
-  fetch(API_BASE + '/api/query?q=' + encodeURIComponent(q))
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(data => {
-      loading.style.display = 'none';
-      if (!data.results || data.results.length === 0) {
-        empty.style.display = 'block'; return;
-      }
-      let html = '';
-      data.results.slice(0, 3).forEach(r => {
-        let scoreClass = 'low';
-        if (r.score >= 0.7) scoreClass = 'high';
-        else if (r.score >= 0.5) scoreClass = 'med';
-        html += `<div class="lq-card" onclick="openPageModal('${escAttr(r.slug)}')">
-          <div class="lq-header"><span class="lq-score ${scoreClass}">${Math.round(r.score * 100)}%</span>
-          <span class="lq-path">${esc(r.slug)}</span></div>
-          <div class="lq-snippet">${esc((r.snippet||'').trim()) || '<span style="opacity:0.4">(no preview)</span>'}</div></div>`;
-      });
-      thread.innerHTML += `<div style="margin-bottom:12px">${html}</div>`;
-      thread.scrollIntoView({behavior:'smooth'});
-    })
-    .catch(err => {
-      loading.style.display = 'none';
-      error.textContent = 'Connection failed — ' + err.message;
-      error.style.display = 'block';
-    });
-}
-
-// ─── Scroll-aware chat bubble hide (mobile) ───
-(function() {
-  var lastY = 0;
-  var SCROLL_HIDE = 60;
-  window.addEventListener('scroll', function() {
-    var chatBubble = document.getElementById('chatBubble');
-    var chatPanel = document.getElementById('chatPanel');
-    if (!chatBubble) return;
-    var y = window.pageYOffset || document.documentElement.scrollTop;
-    // Don't hide when chat is open
-    if (chatPanel && chatPanel.classList.contains('active')) {
-      chatBubble.classList.remove('chat-hidden');
-      lastY = y;
-      return;
-    }
-    if (y > SCROLL_HIDE && y > lastY + 5) {
-      chatBubble.classList.add('chat-hidden');
-    } else if (y < lastY - 5 || y <= SCROLL_HIDE) {
-      chatBubble.classList.remove('chat-hidden');
-    }
-    lastY = y;
-  }, { passive: true });
-})();
-
-// ─── Chat Bubble (desktop) ───
-let chatOpen = false;
 let conversationHistory = [];
 const MAX_HISTORY = 6;
+let assistantReady = false;
 
-function toggleChat() {
-  chatOpen = !chatOpen;
-  document.getElementById('chatPanel').classList.toggle('active', chatOpen);
-  document.getElementById('chatBubble').innerHTML = chatOpen ? '✕' : '<svg viewBox="0 0 16 16" width="20" height="20"><path d="M2 2h12v9H6l-4 3V2z" stroke="#1a1b26" fill="none" stroke-width="1.5"/></svg>';
-  if (chatOpen) document.getElementById('chatInput').focus();
+function initAssistant() {
+  if (assistantReady) return;
+  assistantReady = true;
+
+  // Wire up the input
+  const input = document.getElementById('lqInput');
+  if (!input) return;
+  input.placeholder = 'Ask anything — e.g. "what should I know before meeting Zaim?"';
+  input.onkeydown = function(e) { if (e.key === 'Enter') sendAssistantQuery(); };
+
+  const btn = document.getElementById('lqBtn');
+  if (btn) { btn.textContent = 'Ask'; btn.onclick = sendAssistantQuery; }
+
+  // Hide old search result displays, show chat
+  var lqResults = document.getElementById('lqResults');
+  var lqLoading = document.getElementById('lqLoading');
+  var lqError = document.getElementById('lqError');
+  var lqEmpty = document.getElementById('lqEmpty');
+
+  // Create chat messages container if not exists
+  if (!document.getElementById('assistantMessages')) {
+    var msgs = document.createElement('div');
+    msgs.id = 'assistantMessages';
+    msgs.className = 'assistant-messages';
+    msgs.innerHTML = '<div class="assistant-welcome" id="assistantWelcome">' +
+      '👋 <strong>Ask me anything</strong> about your knowledge base.<br><br>' +
+      '<div class="starter-grid">' +
+        '<button class="starter-pill" onclick="askStarter(\'what should i know before my next meeting?\')">Prep for meetings</button>' +
+        '<button class="starter-pill" onclick="askStarter(\'what are my open action items?\')">Action items</button>' +
+        '<button class="starter-pill" onclick="askStarter(\'what happened in my last meeting with Zaim?\')">Last meeting with Zaim</button>' +
+        '<button class="starter-pill" onclick="askStarter(\'show me all people\')">People directory</button>' +
+      '</div>' +
+    '</div>';
+
+    // Insert after the live-query-bar
+    var bar = document.querySelector('.live-query-bar');
+    if (bar && bar.parentNode) {
+      bar.parentNode.insertBefore(msgs, bar.nextSibling);
+    }
+  }
+
+  // Repurpose loading/error/empty for assistant
+  if (lqLoading) lqLoading.id = 'assistantLoading';
+  if (lqError) lqError.id = 'assistantError';
+  if (lqEmpty) lqEmpty.id = 'assistantEmpty';
+  if (lqResults) { lqResults.style.display = 'none'; lqResults.id = 'assistantResults'; }
+
+  // Hide old mobile query elements
+  var mqInput = document.getElementById('mqInput');
+  var mqThread = document.getElementById('mqThread');
+  if (mqInput) mqInput.style.display = 'none';
+  if (mqThread) mqThread.style.display = 'none';
 }
 
-function addChatMessage(html, role) {
-  const d = document.createElement('div');
-  d.className = 'chat-msg ' + role;
-  d.innerHTML = html;
-  const c = document.getElementById('chatMessages');
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
+// Called after data loads
+if (typeof DATA !== 'undefined' || typeof MCP_CONNECTED !== 'undefined') {
+  initAssistant();
+} else {
+  // Wait for data
+  var _origLoadData = loadData;
+  loadData = function() {
+    _origLoadData.apply(this, arguments);
+    setTimeout(initAssistant, 500);
+  };
+}
+
+function sendAssistantQuery() {
+  var input = document.getElementById('lqInput');
+  var btn = document.getElementById('lqBtn');
+  var q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  if (btn) btn.disabled = true;
+
+  var welcome = document.getElementById('assistantWelcome');
+  if (welcome) welcome.style.display = 'none';
+
+  var msgs = document.getElementById('assistantMessages');
+  var loading = document.getElementById('assistantLoading');
+  var error = document.getElementById('assistantError');
+
+  // Add user message
+  addAssistantBubble(esc(q), 'user');
+  conversationHistory.push({ role: 'user', text: q });
+  if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+
+  // Show thinking
+  if (loading) loading.style.display = 'block';
+  if (error) error.style.display = 'none';
+
+  var API_BASE = localStorage.getItem('gbrain-query-api') || '';
+  var url = API_BASE + '/api/assistant?q=' + encodeURIComponent(q) + '&model=deepseek';
+
+  fetch(url)
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(data) {
+      if (loading) loading.style.display = 'none';
+      addAssistantResponse(data);
+      conversationHistory.push({ role: 'assistant', text: (data.response || '').substring(0, 200) });
+      if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
+    })
+    .catch(function(err) {
+      if (loading) loading.style.display = 'none';
+      if (error) { error.textContent = 'Failed to reach the assistant — ' + err.message; error.style.display = 'block'; }
+
+      // Still show the error in chat
+      var d = document.createElement('div');
+      d.className = 'assistant-msg assistant';
+      d.innerHTML = '<div class="assistant-body"><div class="assistant-text">Sorry, I couldn\'t reach the knowledge base. Is the API server running?</div></div>';
+      if (msgs) msgs.appendChild(d);
+    })
+    .finally(function() { if (btn) btn.disabled = false; });
+}
+
+function addAssistantBubble(html, role) {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+  var d = document.createElement('div');
+  d.className = 'assistant-msg ' + role;
+  d.innerHTML = '<div class="assistant-body"><div class="assistant-text">' + html + '</div></div>';
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 function formatAssistantText(text) {
-  let html = esc(text);
+  var html = esc(text);
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  html = html.replace(/(?:^|\n)&gt; (.+)/g, '<blockquote>$1</blockquote>');
+  html = html.replace(/(?:^|\n)> (.+)/g, '<blockquote>$1</blockquote>');
   html = html.replace(/\n\n/g, '<br><br>');
   html = html.replace(/\n/g, '<br>');
   return html.replace(/^(<br>)+/, '');
 }
 
-function addAssistantMessage(data) {
-  const d = document.createElement('div');
-  d.className = 'chat-msg assistant';
-  let html = '<div class="bot-msg-body"><div class="bot-msg-text">' + formatAssistantText(data.response) + '</div></div>';
+function addAssistantResponse(data) {
+  var msgs = document.getElementById('assistantMessages');
+  if (!msgs) return;
+
+  var d = document.createElement('div');
+  d.className = 'assistant-msg assistant';
+
+  // Response text
+  var html = '<div class="assistant-body"><div class="assistant-text">' + formatAssistantText(data.response || 'No response') + '</div></div>';
+
+  // Refined badge
+  if (data.refined) {
+    html += '<div class="assistant-refined">✨ Synthesized with AI</div>';
+  }
+
+  // Sources
   if (data.sources && data.sources.length > 0) {
-    const srcCount = data.sources.length;
-    html += '<button class="bot-sources-toggle" onclick="toggleSources(this)">' + srcCount + ' source' + (srcCount !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
-    html += '<div class="bot-sources">';
+    var srcCount = data.sources.length;
+    html += '<button class="assistant-sources-toggle" onclick="toggleAssistantSources(this)">' + srcCount + ' source' + (srcCount !== 1 ? 's' : '') + ' <span class="arrow">▸</span></button>';
+    html += '<div class="assistant-sources">';
     data.sources.forEach(function(s) {
-      const name = s.slug.split('/').pop().replace(/-/g, ' ').replace(/_/g, ' ');
-      html += '<div class="bot-source-card" onclick="openPageModal(\'' + escAttr(s.slug) + '\')"><span class="src-score ' + s.score_class + '">' + s.score + '%</span><div class="src-info"><div class="src-title">' + esc(name) + '</div><div class="src-snippet">' + esc((s.snippet||'').substring(0,150)) + '</div></div></div>';
+      var name = s.slug.split('/').pop().replace(/-/g, ' ').replace(/_/g, ' ');
+      html += '<div class="assistant-source-card" onclick="openPageModal(\'' + escAttr(s.slug) + '\')"><span class="src-score ' + s.score_class + '">' + s.score + '%</span><div class="src-info"><div class="src-title">' + esc(name) + '</div><div class="src-snippet">' + esc((s.snippet || '').substring(0, 150)) + '</div></div></div>';
     });
     html += '</div>';
   }
+
+  // Follow-ups
   if (data.followups && data.followups.length > 0) {
-    html += '<div class="bot-followups">';
+    html += '<div class="assistant-followups">';
     data.followups.forEach(function(f) {
-      html += '<button class="bot-followup-pill" onclick="askFollowup(\'' + escAttr(f) + '\')">' + esc(f) + '</button>';
+      html += '<button class="assistant-followup-pill" onclick="askFollowup(\'' + escAttr(f) + '\')">' + esc(f) + '</button>';
     });
     html += '</div>';
   }
+
   d.innerHTML = html;
-  const c = document.getElementById('chatMessages');
-  c.appendChild(d);
-  c.scrollTop = c.scrollHeight;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-function toggleSources(btn) { btn.classList.toggle('open'); btn.nextElementSibling.classList.toggle('open'); }
-function askStarter(q) { document.getElementById('chatInput').value = q; sendChat(); }
-function askFollowup(q) { document.getElementById('chatInput').value = q; sendChat(); }
-function clearChat() {
-  const msgs = document.getElementById('chatMessages');
-  const welcome = document.getElementById('chatWelcome');
-  msgs.innerHTML = '';
-  msgs.appendChild(welcome);
-  welcome.style.display = '';
+function toggleAssistantSources(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+function askStarter(q) {
+  var input = document.getElementById('lqInput');
+  if (input) { input.value = q; sendAssistantQuery(); }
+}
+
+function askFollowup(q) {
+  var input = document.getElementById('lqInput');
+  if (input) { input.value = q; sendAssistantQuery(); }
+}
+
+function clearAssistantChat() {
+  var msgs = document.getElementById('assistantMessages');
+  var welcome = document.getElementById('assistantWelcome');
+  if (msgs) msgs.innerHTML = '';
+  if (welcome) { msgs.appendChild(welcome); welcome.style.display = ''; }
   conversationHistory = [];
 }
-function switchModel() {
-  try { localStorage.setItem('gbrain-chat-model', document.getElementById('chatModel').value); } catch(e) {}
+
+// ─── Escaping helpers (shared) ───
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-(function() {
-  try { const saved = localStorage.getItem('gbrain-chat-model'); if (saved === 'claude-haiku' || saved === 'deepseek') document.getElementById('chatModel').value = saved; } catch(e) {}
-})();
-function sendChat() {
-  const input = document.getElementById('chatInput');
-  const btn = document.getElementById('chatSendBtn');
-  const q = input.value.trim();
-  if (!q) return;
-  input.value = ''; btn.disabled = true;
-  document.getElementById('chatWelcome').style.display = 'none';
-  addChatMessage(esc(q), 'user');
-  conversationHistory.push({ role: 'user', text: q });
-  if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
-  const typing = document.getElementById('chatTyping');
-  typing.classList.add('active');
-  let dots = 0;
-  const dotInterval = setInterval(function() { dots = (dots + 1) % 4; typing.innerHTML = 'Thinking' + '.'.repeat(dots); }, 400);
-  const API_BASE = localStorage.getItem('gbrain-query-api') || '';
-  const model = document.getElementById('chatModel').value;
-  fetch(API_BASE + '/api/assistant?q=' + encodeURIComponent(q) + '&model=' + encodeURIComponent(model))
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(data) {
-      clearInterval(dotInterval); typing.classList.remove('active');
-      addAssistantMessage(data);
-      conversationHistory.push({ role: 'assistant', text: data.response.substring(0, 200) });
-      if (conversationHistory.length > MAX_HISTORY) conversationHistory.shift();
-    })
-    .catch(function(err) {
-      clearInterval(dotInterval); typing.classList.remove('active');
-      addAssistantMessage({ response: "Sorry, I couldn't reach the knowledge base right now.\n\n" + err.message, sources: [], followups: ['Try again', 'Check brain health', 'Browse all pages'], type: 'error' });
-    })
-    .finally(function() { btn.disabled = false; });
+function escAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
-  </script>
-  <script>
-// ─── Live Query ───
-function runLiveQuery() {
-  var input = document.getElementById('lqInput');
-  var btn = document.getElementById('lqBtn');
-  var results = document.getElementById('lqResults');
-  var loading = document.getElementById('lqLoading');
-  var error = document.getElementById('lqError');
-  var empty = document.getElementById('lqEmpty');
-  var q = input.value.trim();
-  if (!q) return;
-  btn.disabled = true;
-  results.innerHTML = '';
-  error.style.display = 'none';
-  empty.style.display = 'none';
-  loading.style.display = 'block';
-
-  // Use MCP if connected
-  if (MCP_CONNECTED && MCP_URL) {
-    mcpCall('query', { q: q })
-      .then(function(data) {
-        loading.style.display = 'none';
-        var hits = data.results || data || [];
-        if (!hits.length) { empty.style.display = 'block'; return; }
-        var html = '';
-        hits.forEach(function(r) {
-          var scorePct = Math.round((r.score || 0.5) * 100);
-          var scoreClass = scorePct >= 70 ? 'high' : scorePct >= 50 ? 'med' : 'low';
-          html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(r.slug || '') + '\')">' +
-            '<div class="lq-header"><span class="lq-score ' + scoreClass + '">' + scorePct + '%</span>' +
-            '<span class="lq-path">' + esc(r.slug || '') + '</span></div>' +
-            '<div class="lq-snippet">' + esc((r.snippet || r.body || r.text || '').substring(0, 200)) + '</div></div>';
-        });
-        results.innerHTML = html;
-      })
-      .catch(function(err) {
-        loading.style.display = 'none';
-        error.textContent = 'Query failed — ' + err.message;
-        error.style.display = 'block';
-      })
-      .finally(function() { btn.disabled = false; });
-    return;
-  }
-
-  // Fallback: local page search
-  loading.style.display = 'none';
-  var ql = q.toLowerCase();
-  var matches = (DATA.pages || []).filter(function(p) {
-    return (p.title || '').toLowerCase().indexOf(ql) >= 0 ||
-           (p.body || '').toLowerCase().indexOf(ql) >= 0 ||
-           (p.slug || '').toLowerCase().indexOf(ql) >= 0;
-  }).slice(0, 20);
-  if (!matches.length) { empty.style.display = 'block'; btn.disabled = false; return; }
-  var html = '';
-  matches.forEach(function(p) {
-    var body = (p.body || '').substring(0, 200);
-    html += '<div class="lq-card" onclick="openPageModal(\'' + escAttr(p.slug) + '\')">' +
-      '<div class="lq-header"><span class="lq-score med">match</span>' +
-      '<span class="lq-path">' + esc(p.slug) + '</span></div>' +
-      '<div class="lq-snippet">' + esc(body || '(no content)') + '</div></div>';
-  });
-  results.innerHTML = html;
-  btn.disabled = false;
-}
-
-loadData();
-
   </script>
   <script>
 // ═══════════════════════════════════════════════
