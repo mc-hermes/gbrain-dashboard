@@ -266,4 +266,6 @@ function renderAll() {
   document.querySelectorAll('#feedSourceTabs .feed-source-tab').forEach(t => {
     t.onclick = function(){ filterFeed(this.getAttribute('data-src')); };
   });
+  // Init the unified assistant after render
+  if (typeof initAssistant === 'function') initAssistant();
 }

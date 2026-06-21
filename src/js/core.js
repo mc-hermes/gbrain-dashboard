@@ -8,6 +8,8 @@ let healthRendered = false;
 let artifactsRendered = false;
 // ─── VIEW SWAPPING ───
 function showView(name) {
+  // Redirect removed 'ask' view to today (unified assistant)
+  if (name === 'ask') name = 'today';
   activeView = name;
   // Hide all view panels
   document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));

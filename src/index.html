@@ -23,7 +23,6 @@
   <button class="sidebar-item active" data-view="today" onclick="showView('today')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg></span><span class="s-label">Today</span></button>
   <button class="sidebar-item" data-view="browse" onclick="showView('browse')"><span class="s-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Library</span></button>
   <button class="sidebar-item" data-view="graph" onclick="showView('graph')"><span class="s-icon"><svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg></span><span class="s-label">Graph</span></button>
-  <button class="sidebar-item" data-view="ask" onclick="showView('ask')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span><span class="s-label">Ask</span></button>
   <button class="sidebar-item" data-view="logs" onclick="showView('logs')"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 6.5h10M3 10h7M3 13h5" stroke="currentColor" stroke-linecap="round"/></svg></span><span class="s-label">Activity</span></button>
   <div class="sidebar-spacer"></div>
   <button class="sidebar-item write-btn" onclick="openWrite()"><span class="s-icon"><svg viewBox="0 0 16 16"><path d="M3 13h10M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span class="s-label">Write</span></button>
@@ -59,7 +58,6 @@
     <div class="tabs desktop-view-tabs" id="desktopViewTabs" style="margin-bottom:16px">
       <button class="tab active" data-dview="today" onclick="showView('today')"><span class="tab-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none"/><path d="M5 7h6M5 10h6" stroke="currentColor"/></svg></span> Today</button>
       <button class="tab" data-dview="browse" onclick="showView('browse')"><span class="tab-icon"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" fill="none"/></svg></span> Browse</button>
-      <button class="tab" data-dview="ask" onclick="showView('ask')"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span> Ask</button>
       <button class="tab" data-dview="graph" onclick="showView('graph')"><span class="tab-icon"><svg viewBox="0 0 16 16"><circle cx="5" cy="5" r="2" stroke="currentColor" fill="none"/><circle cx="11" cy="4" r="1.5" stroke="currentColor" fill="none"/><circle cx="8" cy="11" r="2.5" stroke="currentColor" fill="none"/><path d="M6 6l2 4M10 5l-1 4" stroke="currentColor"/></svg></span> Graph</button>
       <button class="tab" data-dview="logs" onclick="showView('logs')"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M3 3h10M3 6.5h10M3 10h7M3 13h5" stroke="currentColor" stroke-linecap="round"/></svg></span> Logs</button>
       <button class="tab write-tab-item" onclick="openWrite()"><span class="tab-icon"><svg viewBox="0 0 16 16"><path d="M3 13h10M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> Write</button>
@@ -72,17 +70,16 @@
       <!-- Stat Chips (compact, Today only) -->
       <div class="stat-chips" id="statChips"></div>
 
-      <!-- Live Query -->
+      <!-- Assistant -->
       <div class="live-query-section">
-        <div class="section-header"><h2>Ask</h2></div>
+        <div class="section-header"><h2>Ask</h2><span class="refined-badge" id="refinedBadge" style="display:none;font-size:0.6rem;color:var(--accent);margin-left:8px">✨ AI</span></div>
         <div class="live-query-bar">
-          <input type="text" id="lqInput" placeholder="Ask anything about your brain..." onkeydown="if(event.key==='Enter') runLiveQuery()">
-          <button id="lqBtn" onclick="runLiveQuery()">Ask</button>
+          <input type="text" id="lqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendAssistantQuery()">
+          <button id="lqBtn" onclick="sendAssistantQuery()">Ask</button>
         </div>
-        <div class="lq-loading" id="lqLoading"><span class="spinner"></span> Querying brain...</div>
-        <div class="lq-error" id="lqError"></div>
-        <div class="lq-empty" id="lqEmpty">No results found.</div>
-        <div class="live-query-results" id="lqResults"></div>
+        <div class="lq-loading" id="assistantLoading" style="display:none"><span class="spinner"></span> Thinking...</div>
+        <div class="lq-error" id="assistantError" style="display:none"></div>
+        <div class="live-query-results" id="assistantResults" style="display:none"></div>
       </div>
 
       <!-- Today Feed -->
@@ -159,23 +156,6 @@
       </div>
     </div>
 
-    <!-- === VIEW: Ask (mobile chat-style) === -->
-    <div class="view-panel" id="view-ask">
-      <div class="live-query-section" style="margin-bottom:8px">
-        <div class="section-header"><h2>Ask</h2></div>
-        <div class="live-query-bar">
-          <input type="text" id="mqInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') runMobileQuery()">
-          <button onclick="runMobileQuery()">Ask</button>
-        </div>
-        <div class="lq-loading" id="mqLoading"><span class="spinner"></span> Querying...</div>
-        <div class="lq-error" id="mqError"></div>
-        <div class="lq-empty" id="mqEmpty">No results found.</div>
-        <div class="live-query-results" id="mqResults"></div>
-      </div>
-      <!-- Chat-style result thread -->
-      <div id="mqThread"></div>
-    </div>
-
     <!-- === VIEW: Logs (live workflow activity) === -->
     <div class="view-panel" id="view-logs">
       <div class="section">
@@ -232,9 +212,6 @@
     <button class="nav-write-btn" onclick="openWrite()" title="Write a note">
       <svg viewBox="0 0 16 16"><path d="M3 13h10M8 2v10M3 7h10" stroke="currentColor" stroke-linecap="round"/></svg>
     </button>
-    <button class="mobile-nav-btn" data-view="ask" onclick="showView('ask')">
-      <span class="nav-icon"><svg viewBox="0 0 16 16"><path d="M2 2h12v9H6l-4 3V2z" stroke="currentColor" fill="none"/></svg></span> Ask
-    </button>
     <button class="mobile-nav-btn" data-view="more" onclick="toggleMoreMenu()">
       <span class="nav-icon">···</span> More
     </button>
@@ -283,43 +260,15 @@
     <button class="graph-reset" style="position:static;display:block;width:100%;text-align:center" onclick="resetGraph()">↺ Reset graph positions</button>
   </div>
 </div>
+<!-- Floating Buttons -->
+<div class="float-btns">
+<button class="float-btn cog-btn" onclick="toggleSettings()" title="Settings"><svg viewBox="0 0 16 16" width="20" height="20"><circle cx="8" cy="8" r="2.5" stroke="currentColor" fill="none"/><path d="M8 2v1.5M8 12.5v1.5M2 8h1.5M12.5 8h1.5M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor"/></svg></button>
+<button class="float-btn help-btn" onclick="openDocs()" title="Help &amp; Documentation (press ?)">?</button>
+</div>
 
 <!-- Modal Overlay -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
   <div class="modal" id="modal" onclick="event.stopPropagation()"></div>
-</div>
-
-<!-- Chat Bubble (desktop) -->
-<button class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Chat with gbrain assistant"><svg viewBox="0 0 16 16" width="20" height="20"><path d="M2 2h12v9H6l-4 3V2z" stroke="#1a1b26" fill="none" stroke-width="1.5"/></svg></button>
-<div class="chat-panel" id="chatPanel">
-  <div class="chat-header">
-    <h3>Assistant</h3>
-    <div class="chat-header-actions">
-      <select id="chatModel" onchange="switchModel()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);border-radius:6px;padding:4px 8px;font-size:0.68rem;font-family:'Inter',sans-serif;cursor:pointer;outline:none">
-        <option value="deepseek">DeepSeek Flash</option>
-        <option value="claude-haiku">Claude Haiku</option>
-      </select>
-      <button class="chat-clear" onclick="clearChat()" title="Clear conversation">Clear</button>
-      <button onclick="toggleChat()">✕</button>
-    </div>
-  </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-welcome" id="chatWelcome">
-      👋 I'm your gbrain assistant — I can search your knowledge base and synthesize answers.<br><br>
-      <strong>Try asking:</strong>
-      <div class="starter-grid">
-        <button class="starter-pill" onclick="askStarter('who have I met with recently?')">Who have I met with?</button>
-        <button class="starter-pill" onclick="askStarter('what projects am I working on?')">What projects?</button>
-        <button class="starter-pill" onclick="askStarter('show me recent meetings')">Recent meetings</button>
-        <button class="starter-pill" onclick="askStarter('what is this dashboard')">About this dashboard</button>
-      </div>
-    </div>
-  </div>
-  <div class="chat-typing" id="chatTyping">Thinking<span class="typing-dots">...</span></div>
-  <div class="chat-input-bar">
-    <input type="text" id="chatInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendChat()">
-    <button id="chatSendBtn" onclick="sendChat()">Send</button>
-  </div>
 </div>
 
 <!-- Docs Overlay -->
@@ -400,8 +349,7 @@
   <!-- INJECT:js/crm.js -->
   <!-- INJECT:js/theme.js -->
   <!-- INJECT:js/docs.js -->
-  <!-- INJECT:js/chat.js -->
-  <!-- INJECT:js/live-query.js -->
+  <!-- INJECT:js/assistant.js -->
   <!-- INJECT:js/write.js -->
   <!-- INJECT:js/logs.js -->
 </main>
